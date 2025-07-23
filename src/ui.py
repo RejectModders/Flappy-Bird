@@ -1,6 +1,6 @@
-import pygame
-import random
 import datetime
+
+import pygame
 
 from src.constants import (
     BLACK,

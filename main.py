@@ -17,7 +17,6 @@ from src.constants import (
     SETTINGS,
     STATS,
     load_audio,
-    load_image,
 )
 from src.objects import Base, Bird, Pipe
 from src.ui import (
@@ -27,6 +26,7 @@ from src.ui import (
     ScoreDisplay,
     SettingsScreen,
     StatsScreen,
+    time_based_background,
 )
 
 
@@ -189,8 +189,8 @@ def main() -> None:
             settings_screen.draw(SCREEN)
 
         elif game_state == PLAYING:
-            # Draw background
-            SCREEN.blit(load_image("background-day.png"), (0, 0))
+            # Draw background - use time-based background instead of hardcoded day background
+            SCREEN.blit(time_based_background(), (0, 0))
 
             # Draw pipes
             for pipe in pipes:
@@ -206,8 +206,8 @@ def main() -> None:
             score_display.draw(SCREEN, score)
 
         elif game_state == GAME_OVER:
-            # Draw background
-            SCREEN.blit(load_image("background-day.png"), (0, 0))
+            # Draw background - use time-based background
+            SCREEN.blit(time_based_background(), (0, 0))
 
             # Draw pipes
             for pipe in pipes:
@@ -224,7 +224,7 @@ def main() -> None:
 
         elif game_state == STATS:
             # Draw background
-            SCREEN.blit(load_image("background-day.png"), (0, 0))
+            SCREEN.blit(time_based_background(), (0, 0))
 
             # Draw stats screen
             stats_screen.draw(SCREEN)
