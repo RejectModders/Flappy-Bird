@@ -1,34 +1,66 @@
-from src.constants import *
+import pygame
+import random
+import datetime
+
+from src.constants import (
+    BLACK,
+    BLUE,
+    EASY,
+    GAME_OVER,
+    GAME_SETTINGS,
+    GREEN,
+    HARD,
+    MAIN_MENU,
+    MEDIUM,
+    PLAYING,
+    RED,
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
+    SETTINGS,
+    STATS,
+    WHITE,
+    YELLOW,
+    load_audio,
+    load_image,
+)
+
+
+def time_based_background() -> pygame.Surface:
+    """Returns background based on local time (day or night)."""
+    current_hour = datetime.datetime.now().hour
+    # Day time is typically between 6 AM and 6 PM (6-18)
+    is_daytime = 6 <= current_hour < 18
+    return load_image(f"background-{'day' if is_daytime else 'night'}.png")
 
 
 class Button:
     def __init__(
         self,
-        x,
-        y,
-        width,
-        height,
-        text,
-        text_color=WHITE,
-        bg_color=GREEN,
-        hover_color=None,
-    ):
-        self.rect = pygame.Rect(x, y, width, height)
-        self.text = text
-        self.text_color = text_color
-        self.bg_color = bg_color
-        self.hover_color = hover_color or (
+        x: int,
+        y: int,
+        width: int,
+        height: int,
+        text: str,
+        text_color: tuple[int, int, int] = WHITE,
+        bg_color: tuple[int, int, int] = GREEN,
+        hover_color: tuple[int, int, int] | None = None,
+    ) -> None:
+        self.rect: pygame.Rect = pygame.Rect(x, y, width, height)
+        self.text: str = text
+        self.text_color: tuple[int, int, int] = text_color
+        self.bg_color: tuple[int, int, int] = bg_color
+        self.hover_color: tuple[int, int, int] = hover_color or (
             min(bg_color[0] + 30, 255),
             min(bg_color[1] + 30, 255),
             min(bg_color[2] + 30, 255),
         )
-        self.is_hovered = False
-        self.font = pygame.font.Font(None, 32)
+        self.is_hovered: bool = False
+        self.font: pygame.font.Font = pygame.font.Font(None, 32)
 
-    def update(self, mouse_pos):
+    def update(self, mouse_pos: tuple[int, int]) -> None:
         self.is_hovered = self.rect.collidepoint(mouse_pos)
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface) -> None:
         # Draw button background
         color = self.hover_color if self.is_hovered else self.bg_color
         pygame.draw.rect(surface, color, self.rect)
@@ -39,48 +71,48 @@ class Button:
         text_rect = text_surf.get_rect(center=self.rect.center)
         surface.blit(text_surf, text_rect)
 
-    def is_clicked(self, mouse_pos, click):
+    def is_clicked(self, mouse_pos: tuple[int, int], click: bool) -> bool:
         return self.rect.collidepoint(mouse_pos) and click
 
 
 class LoadingScreen:
-    def __init__(self):
-        self.background = load_image("background-day.png")
-        self.logo = load_image("message.png")
-        self.base = load_image("base.png")
-        self.start_time = pygame.time.get_ticks()
-        self.duration = 3000  # 3 seconds for a better experience
-        self.is_done = False
-        self.swoosh_sound = load_audio("swoosh.wav")
-        self.played_sound = False
+    def __init__(self) -> None:
+        self.background: pygame.Surface = time_based_background()
+        self.logo: pygame.Surface = load_image("message.png")
+        self.base: pygame.Surface = load_image("base.png")
+        self.start_time: int = pygame.time.get_ticks()
+        self.duration: int = 3000
+        self.is_done: bool = False
+        self.swoosh_sound: pygame.mixer.Sound = load_audio("swoosh.wav")
+        self.played_sound: bool = False
 
         # Base animation properties
-        self.base_width = self.base.get_width()
-        self.base_height = self.base.get_height()
-        self.base_y = SCREEN_HEIGHT - self.base_height
-        self.base_x = 0
-        self.base_scroll_speed = 2
+        self.base_width: int = self.base.get_width()
+        self.base_height: int = self.base.get_height()
+        self.base_y: int = SCREEN_HEIGHT - self.base_height
+        self.base_x: int = 0
+        self.base_scroll_speed: int = 2
 
         # Create a bird for loading animation
-        self.bird_frames = [
+        self.bird_frames: list[pygame.Surface] = [
             load_image("yellowbird-downflap.png"),
             load_image("yellowbird-midflap.png"),
             load_image("yellowbird-upflap.png"),
         ]
-        self.bird_index = 0
-        self.bird_frame_count = 0
-        self.bird_position = [SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2]
-        self.bird_movement = 1  # Subtle up and down movement
-        self.bird_direction = 1  # 1 for up, -1 for down
+        self.bird_index: int = 0
+        self.bird_frame_count: int = 0
+        self.bird_position: list[int] = [SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2]
+        self.bird_movement: int = 1  # Subtle up and down movement
+        self.bird_direction: int = 1  # 1 for up, -1 for down
 
         # Loading progress dots
-        self.dot_radius = 5
-        self.dot_count = 3
-        self.dot_spacing = 15
-        self.dot_animation_timer = 0
-        self.active_dots = 0
+        self.dot_radius: int = 5
+        self.dot_count: int = 3
+        self.dot_spacing: int = 15
+        self.dot_animation_timer: int = 0
+        self.active_dots: int = 0
 
-    def update(self):
+    def update(self) -> None:
         current_time = pygame.time.get_ticks()
         if current_time - self.start_time > self.duration:
             self.is_done = True
@@ -121,7 +153,7 @@ class LoadingScreen:
             ):  # If we've cycled through all dots, add a brief pause
                 self.active_dots = 1
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface) -> None:
         # Draw background
         surface.blit(self.background, (0, 0))
 
@@ -196,29 +228,32 @@ class LoadingScreen:
 
 
 class MainMenu:
-    def __init__(self):
-        self.background = load_image("background-day.png")
-        self.base = load_image("base.png")
-        self.logo = load_image("message.png")
+    def __init__(self) -> None:
+        self.background: pygame.Surface = time_based_background()
+        self.base: pygame.Surface = load_image("base.png")
+        self.logo: pygame.Surface = load_image("message.png")
 
         # Base animation properties
-        self.base_width = self.base.get_width()
-        self.base_height = self.base.get_height()
-        self.base_y = SCREEN_HEIGHT - self.base_height
-        self.base_x = 0
-        self.base_scroll_speed = 2
+        self.base_width: int = self.base.get_width()
+        self.base_height: int = self.base.get_height()
+        self.base_y: int = SCREEN_HEIGHT - self.base_height
+        self.base_x: int = 0
+        self.base_scroll_speed: int = 2
 
         # Bird animation for menu screen
-        self.bird_frames = [
+        self.bird_frames: list[pygame.Surface] = [
             load_image(f"{GAME_SETTINGS.bird_type}bird-downflap.png"),
             load_image(f"{GAME_SETTINGS.bird_type}bird-midflap.png"),
             load_image(f"{GAME_SETTINGS.bird_type}bird-upflap.png"),
         ]
-        self.bird_index = 0
-        self.bird_frame_count = 0
-        self.bird_position = [SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 30]
-        self.bird_movement = 1.2  # Subtle up and down movement
-        self.bird_direction = 1  # 1 for up, -1 for down
+        self.bird_index: int = 0
+        self.bird_frame_count: int = 0
+        self.bird_position: list[int] = [
+            SCREEN_WIDTH // 2,
+            SCREEN_HEIGHT // 2 - 30,
+        ]
+        self.bird_movement: float = 1.2  # Subtle up and down movement
+        self.bird_direction: int = 1  # 1 for up, -1 for down
 
         # Create buttons
         button_width = 120
@@ -227,7 +262,7 @@ class MainMenu:
         button_x = SCREEN_WIDTH // 2 - button_width // 2
         button_y_offset = 60  # Move all buttons down by 60 pixels (was 40)
 
-        self.play_button = Button(
+        self.play_button: Button = Button(
             button_x,
             SCREEN_HEIGHT // 2 + button_y_offset,
             button_width,
@@ -237,7 +272,7 @@ class MainMenu:
             GREEN,
         )
 
-        self.stats_button = Button(
+        self.stats_button: Button = Button(
             button_x,
             SCREEN_HEIGHT // 2
             + button_spacing
@@ -250,7 +285,7 @@ class MainMenu:
             (100, 100, 200),  # Light purple
         )
 
-        self.settings_button = Button(
+        self.settings_button: Button = Button(
             button_x,
             SCREEN_HEIGHT // 2
             + (button_spacing + button_height) * 2
@@ -263,9 +298,9 @@ class MainMenu:
         )
 
         # High score display
-        self.score_display = ScoreDisplay()
+        self.score_display: ScoreDisplay = ScoreDisplay()
 
-    def update(self, mouse_pos, click):
+    def update(self, mouse_pos: tuple[int, int], click: bool) -> int:
         # Update base animation
         self.base_x -= self.base_scroll_speed
         if self.base_x <= -self.base_width + SCREEN_WIDTH:
@@ -278,7 +313,7 @@ class MainMenu:
             self.bird_index = (self.bird_index + 1) % 3
 
         # Make bird bob up and down slightly
-        self.bird_position[1] += self.bird_direction * self.bird_movement
+        self.bird_position[1] += int(self.bird_direction * self.bird_movement)
         if self.bird_position[1] > SCREEN_HEIGHT // 2 - 20:
             self.bird_direction = -1
         elif self.bird_position[1] < SCREEN_HEIGHT // 2 - 40:
@@ -303,7 +338,7 @@ class MainMenu:
 
         return MAIN_MENU
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface) -> None:
         # Draw background
         surface.blit(self.background, (0, 0))
 
@@ -331,10 +366,18 @@ class MainMenu:
 
 
 class ScoreDisplay:
-    def __init__(self):
-        self.number_images = [load_image(f"{i}.png") for i in range(10)]
+    def __init__(self) -> None:
+        self.number_images: list[pygame.Surface] = [
+            load_image(f"{i}.png") for i in range(10)
+        ]
 
-    def draw(self, surface, score, x=None, y=50):
+    def draw(
+        self,
+        surface: pygame.Surface,
+        score: int,
+        x: int | None = None,
+        y: int = 50,
+    ) -> None:
         score_str = str(score)
         width = 0
 
@@ -354,18 +397,18 @@ class ScoreDisplay:
 
 
 class GameOverScreen:
-    def __init__(self):
-        self.game_over_image = load_image("gameover.png")
-        self.score_display = ScoreDisplay()
-        self.new_high_score = False
-        self.flash_timer = 0
+    def __init__(self) -> None:
+        self.game_over_image: pygame.Surface = load_image("gameover.png")
+        self.score_display: ScoreDisplay = ScoreDisplay()
+        self.new_high_score: bool = False
+        self.flash_timer: int = 0
 
         # Create buttons
         button_width = 120
         button_height = 40
         button_x = SCREEN_WIDTH // 2 - button_width // 2
 
-        self.retry_button = Button(
+        self.retry_button: Button = Button(
             button_x,
             SCREEN_HEIGHT // 2 + 30,
             button_width,
@@ -375,7 +418,7 @@ class GameOverScreen:
             GREEN,
         )
 
-        self.menu_button = Button(
+        self.menu_button: Button = Button(
             button_x,
             SCREEN_HEIGHT // 2 + 80,
             button_width,
@@ -385,11 +428,11 @@ class GameOverScreen:
             BLUE,
         )
 
-    def update_high_score(self, score):
+    def update_high_score(self, score: int) -> None:
         # Check if this score beats the high score for the current difficulty
         self.new_high_score = GAME_SETTINGS.update_high_score(score)
 
-    def update(self, mouse_pos, click):
+    def update(self, mouse_pos: tuple[int, int], click: bool) -> int:
         # Flash effect for new high score
         if self.new_high_score:
             self.flash_timer += 1
@@ -410,7 +453,7 @@ class GameOverScreen:
 
         return GAME_OVER
 
-    def draw(self, surface, score):
+    def draw(self, surface: pygame.Surface, score: int) -> None:
         # Draw game over image
         game_over_rect = self.game_over_image.get_rect(
             center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 4 - 20)
@@ -446,48 +489,48 @@ class GameOverScreen:
 
 
 class SettingsScreen:
-    def __init__(self):
-        self.background = load_image("background-day.png")
-        self.base = load_image("base.png")
+    def __init__(self) -> None:
+        self.background: pygame.Surface = time_based_background()
+        self.base: pygame.Surface = load_image("base.png")
 
         # Base animation properties
-        self.base_width = self.base.get_width()
-        self.base_height = self.base.get_height()
-        self.base_y = SCREEN_HEIGHT - self.base_height
-        self.base_x = 0
-        self.base_scroll_speed = 2
+        self.base_width: int = self.base.get_width()
+        self.base_height: int = self.base.get_height()
+        self.base_y: int = SCREEN_HEIGHT - self.base_height
+        self.base_x: int = 0
+        self.base_scroll_speed: int = 2
 
         # Create preview birds for each difficulty
-        self.yellow_bird = load_image("yellowbird-midflap.png")
-        self.blue_bird = load_image("bluebird-midflap.png")
-        self.red_bird = load_image("redbird-midflap.png")
+        self.yellow_bird: pygame.Surface = load_image("yellowbird-midflap.png")
+        self.blue_bird: pygame.Surface = load_image("bluebird-midflap.png")
+        self.red_bird: pygame.Surface = load_image("redbird-midflap.png")
 
         # Create preview pipes
-        self.green_pipe = load_image("pipe-green.png")
-        self.red_pipe = load_image("pipe-red.png")
+        self.green_pipe: pygame.Surface = load_image("pipe-green.png")
+        self.red_pipe: pygame.Surface = load_image("pipe-red.png")
 
         # Create font
-        self.title_font = pygame.font.Font(None, 36)
-        self.font = pygame.font.Font(None, 24)
+        self.title_font: pygame.font.Font = pygame.font.Font(None, 36)
+        self.font: pygame.font.Font = pygame.font.Font(None, 24)
 
         # Settings panel background - moved up slightly for better positioning
-        self.panel_width = 250
-        self.panel_height = 320
-        self.panel_position = (
+        self.panel_width: int = 250
+        self.panel_height: int = 320
+        self.panel_position: tuple[int, int] = (
             SCREEN_WIDTH // 2 - self.panel_width // 2,
             50,
         )  # Moved up from 70 to 50
 
         # Difficulty selection section
-        self.selection_width = 60  # Width for Easy and Hard buttons
-        self.medium_width = 80  # Wider width for Medium button
-        self.selection_height = 30
+        self.selection_width: int = 60  # Width for Easy and Hard buttons
+        self.medium_width: int = 80  # Wider width for Medium button
+        self.selection_height: int = 30
         selection_y = self.panel_position[1] + 65  # Moved up slightly
 
         # Better spaced buttons with Medium button being wider
         button_spacing = 18  # Reduced spacing for better fit
 
-        self.easy_button = Button(
+        self.easy_button: Button = Button(
             self.panel_position[0] + 15,
             selection_y,
             self.selection_width,
@@ -497,7 +540,7 @@ class SettingsScreen:
             YELLOW,
         )
 
-        self.medium_button = Button(
+        self.medium_button: Button = Button(
             self.panel_position[0]
             + (self.panel_width - self.medium_width) // 2,
             selection_y,
@@ -508,7 +551,7 @@ class SettingsScreen:
             BLUE,
         )
 
-        self.hard_button = Button(
+        self.hard_button: Button = Button(
             self.panel_position[0]
             + self.panel_width
             - self.selection_width
@@ -527,7 +570,7 @@ class SettingsScreen:
         button_spacing = 20
 
         # Save and Back buttons positioned at bottom of panel
-        self.save_button = Button(
+        self.save_button: Button = Button(
             self.panel_position[0]
             + self.panel_width // 2
             - button_width
@@ -540,7 +583,7 @@ class SettingsScreen:
             GREEN,
         )
 
-        self.back_button = Button(
+        self.back_button: Button = Button(
             self.panel_position[0]
             + self.panel_width // 2
             + button_spacing // 2,
@@ -553,10 +596,10 @@ class SettingsScreen:
         )
 
         # To track if settings were changed and need saving
-        self.initial_difficulty = GAME_SETTINGS.difficulty
-        self.has_changes = False
+        self.initial_difficulty: int = GAME_SETTINGS.difficulty
+        self.has_changes: bool = False
 
-    def update(self, mouse_pos, click):
+    def update(self, mouse_pos: tuple[int, int], click: bool) -> int:
         # Update base animation
         self.base_x -= self.base_scroll_speed
         if self.base_x <= -self.base_width + SCREEN_WIDTH:
@@ -601,7 +644,7 @@ class SettingsScreen:
 
         return SETTINGS
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface) -> None:
         # Draw background first
         surface.blit(self.background, (0, 0))
 
@@ -739,50 +782,65 @@ class SettingsScreen:
 
 
 class StatsScreen:
-    def __init__(self):
-        self.background = load_image("background-day.png")
-        self.base = load_image("base.png")
+    def __init__(self) -> None:
+        self.background: pygame.Surface = time_based_background()
+        self.base: pygame.Surface = load_image("base.png")
 
         # Base animation properties
-        self.base_width = self.base.get_width()
-        self.base_height = self.base.get_height()
-        self.base_y = SCREEN_HEIGHT - self.base_height
-        self.base_x = 0
-        self.base_scroll_speed = 2
+        self.base_width: int = self.base.get_width()
+        self.base_height: int = self.base.get_height()
+        self.base_y: int = SCREEN_HEIGHT - self.base_height
+        self.base_x: int = 0
+        self.base_scroll_speed: int = 2
 
         # Medal images for high scores
         if GAME_SETTINGS.get_high_score(EASY) > 10:
-            self.easy_medal = load_image("9.png")  # Gold medal
+            self.easy_medal: pygame.Surface | None = load_image(
+                "9.png"
+            )  # Gold medal
         elif GAME_SETTINGS.get_high_score(EASY) > 0:
-            self.easy_medal = load_image("1.png")  # Silver medal
+            self.easy_medal: pygame.Surface | None = load_image(
+                "1.png"
+            )  # Silver medal
         else:
-            self.easy_medal = None
+            self.easy_medal: pygame.Surface | None = None
 
         if GAME_SETTINGS.get_high_score(MEDIUM) > 10:
-            self.medium_medal = load_image("9.png")  # Gold medal
+            self.medium_medal: pygame.Surface | None = load_image(
+                "9.png"
+            )  # Gold medal
         elif GAME_SETTINGS.get_high_score(MEDIUM) > 0:
-            self.medium_medal = load_image("1.png")  # Silver medal
+            self.medium_medal: pygame.Surface | None = load_image(
+                "1.png"
+            )  # Silver medal
         else:
-            self.medium_medal = None
+            self.medium_medal: pygame.Surface | None = None
 
         if GAME_SETTINGS.get_high_score(HARD) > 10:
-            self.hard_medal = load_image("9.png")  # Gold medal
+            self.hard_medal: pygame.Surface | None = load_image(
+                "9.png"
+            )  # Gold medal
         elif GAME_SETTINGS.get_high_score(HARD) > 0:
-            self.hard_medal = load_image("1.png")  # Silver medal
+            self.hard_medal: pygame.Surface | None = load_image(
+                "1.png"
+            )  # Silver medal
         else:
-            self.hard_medal = None
+            self.hard_medal: pygame.Surface | None = None
 
         # Stats panel
-        self.panel_width = 250
-        self.panel_height = 300
-        self.panel_position = (SCREEN_WIDTH // 2 - self.panel_width // 2, 70)
+        self.panel_width: int = 250
+        self.panel_height: int = 300
+        self.panel_position: tuple[int, int] = (
+            SCREEN_WIDTH // 2 - self.panel_width // 2,
+            70,
+        )
 
         # Create font
-        self.title_font = pygame.font.Font(None, 36)
-        self.font = pygame.font.Font(None, 24)
+        self.title_font: pygame.font.Font = pygame.font.Font(None, 36)
+        self.font: pygame.font.Font = pygame.font.Font(None, 24)
 
         # Back button
-        self.back_button = Button(
+        self.back_button: Button = Button(
             SCREEN_WIDTH // 2 - 60,
             SCREEN_HEIGHT - self.base_height - 60,
             120,
@@ -792,7 +850,7 @@ class StatsScreen:
             (100, 100, 100),  # Gray
         )
 
-    def update(self, mouse_pos, click):
+    def update(self, mouse_pos: tuple[int, int], click: bool) -> int:
         # Update base animation
         self.base_x -= self.base_scroll_speed
         if self.base_x <= -self.base_width + SCREEN_WIDTH:
@@ -808,7 +866,7 @@ class StatsScreen:
 
         return STATS
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface) -> None:
         # Draw background
         surface.blit(self.background, (0, 0))
 
@@ -857,8 +915,14 @@ class StatsScreen:
         self.back_button.draw(surface)
 
     def draw_difficulty_stats(
-        self, surface, name, difficulty, color, y_pos, medal
-    ):
+        self,
+        surface: pygame.Surface,
+        name: str,
+        difficulty: int,
+        color: tuple[int, int, int],
+        y_pos: int,
+        medal: pygame.Surface | None,
+    ) -> None:
         # Draw difficulty name with color
         diff_text = self.font.render(name, True, color)
         surface.blit(diff_text, (self.panel_position[0] + 20, y_pos))
