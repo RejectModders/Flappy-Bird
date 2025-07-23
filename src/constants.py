@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 
 import pygame
 
@@ -45,40 +46,25 @@ CLOCK = pygame.time.Clock()
 
 
 # Load assets
+def resource_path(relative_path: str) -> str:
+    """Get absolute path to resource, works for dev and for PyInstaller"""
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
 def load_image(name: str) -> pygame.Surface:
-    """
-    Load an image from the assets/sprites directory.
-
-    Parameters
-    ----------
-    name : str
-        The filename of the image to load.
-
-    Returns
-    -------
-    pygame.Surface
-        The loaded image as a pygame Surface with alpha channel.
-    """
     return pygame.image.load(
-        os.path.join("assets", "sprites", name)
+        resource_path(os.path.join("assets", "sprites", name))
     ).convert_alpha()
 
 
 def load_audio(name: str) -> pygame.mixer.Sound:
-    """
-    Load an audio file from the assets/audio directory.
-
-    Parameters
-    ----------
-    name : str
-        The filename of the audio file to load.
-
-    Returns
-    -------
-    pygame.mixer.Sound
-        The loaded audio as a pygame Sound object.
-    """
-    return pygame.mixer.Sound(os.path.join("assets", "audio", name))
+    return pygame.mixer.Sound(resource_path(os.path.join("assets", "audio", name)))
 
 
 # Game settings and high score manager

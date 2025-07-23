@@ -17,6 +17,7 @@ from src.constants import (
     SETTINGS,
     STATS,
     load_audio,
+    resource_path,
 )
 from src.objects import Base, Bird, Pipe
 from src.ui import (
@@ -37,7 +38,7 @@ def main() -> None:
 
     # Set up display
     pygame.display.set_caption("Flappy Bird")
-    icon = pygame.image.load("assets/favicon.ico")
+    icon = pygame.image.load(resource_path("assets/favicon.ico"))
     pygame.display.set_icon(icon)
 
     # Load sounds
