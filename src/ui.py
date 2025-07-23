@@ -225,7 +225,7 @@ class MainMenu:
         button_height = 40
         button_spacing = 30
         button_x = SCREEN_WIDTH // 2 - button_width // 2
-        button_y_offset = 40  # Move all buttons down by 40 pixels
+        button_y_offset = 60  # Move all buttons down by 60 pixels (was 40)
 
         self.play_button = Button(
             button_x,

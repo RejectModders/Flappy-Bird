@@ -1,9 +1,24 @@
 import sys
 
 import pygame
-from pygame.locals import *
+from pygame.locals import K_ESCAPE, K_SPACE, KEYDOWN, MOUSEBUTTONDOWN, QUIT
 
-from src.constants import *
+from src.constants import (
+    CLOCK,
+    FPS,
+    GAME_OVER,
+    GAME_SETTINGS,
+    LOADING,
+    MAIN_MENU,
+    PLAYING,
+    SCREEN,
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
+    SETTINGS,
+    STATS,
+    load_audio,
+    load_image,
+)
 from src.objects import Base, Bird, Pipe
 from src.ui import (
     GameOverScreen,
@@ -15,7 +30,7 @@ from src.ui import (
 )
 
 
-def main():
+def main() -> None:
     # Initialize pygame
     pygame.init()
     pygame.mixer.init()
@@ -33,7 +48,7 @@ def main():
     # Game objects
     bird = Bird(50, SCREEN_HEIGHT // 2)
     base = Base()
-    pipes = []
+    pipes: list[Pipe] = []
     score = 0
     last_pipe_time = pygame.time.get_ticks()
 

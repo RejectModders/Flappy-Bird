@@ -45,30 +45,30 @@ CLOCK = pygame.time.Clock()
 
 
 # Load assets
-def load_image(name):
+def load_image(name: str) -> pygame.Surface:
     return pygame.image.load(
         os.path.join("assets", "sprites", name)
     ).convert_alpha()
 
 
-def load_audio(name):
+def load_audio(name: str) -> pygame.mixer.Sound:
     return pygame.mixer.Sound(os.path.join("assets", "audio", name))
 
 
 # Game settings and high score manager
 class Settings:
-    def __init__(self):
-        self.settings_file = "game_data.json"
-        self.difficulty = EASY
+    def __init__(self) -> None:
+        self.settings_file: str = "game_data.json"
+        self.difficulty: int = EASY
 
         # Store separate high scores for each difficulty level
-        self.high_scores = {EASY: 0, MEDIUM: 0, HARD: 0}
+        self.high_scores: dict[int, int] = {EASY: 0, MEDIUM: 0, HARD: 0}
 
-        self.bird_type = "yellow"
-        self.pipe_color = "green"
+        self.bird_type: str = "yellow"
+        self.pipe_color: str = "green"
         self.load_settings()
 
-    def load_settings(self):
+    def load_settings(self) -> None:
         try:
             if os.path.exists(self.settings_file):
                 with open(self.settings_file, "r") as f:
@@ -102,7 +102,7 @@ class Settings:
             print(f"Error loading settings: {e}")
             # Use defaults if file can't be loaded
 
-    def save_settings(self):
+    def save_settings(self) -> None:
         try:
             with open(self.settings_file, "w") as f:
                 data = {
@@ -115,7 +115,7 @@ class Settings:
         except Exception as e:
             print(f"Error saving settings: {e}")
 
-    def set_difficulty(self, difficulty):
+    def set_difficulty(self, difficulty: int) -> None:
         self.difficulty = difficulty
 
         # Update bird and pipe colors based on difficulty
@@ -131,7 +131,7 @@ class Settings:
 
         self.save_settings()
 
-    def update_high_score(self, score):
+    def update_high_score(self, score: int) -> bool:
         current_difficulty = self.difficulty
         if score > self.high_scores[current_difficulty]:
             self.high_scores[current_difficulty] = score
@@ -139,13 +139,13 @@ class Settings:
             return True
         return False
 
-    def get_high_score(self, difficulty=None):
+    def get_high_score(self, difficulty: int | None = None) -> int:
         """Get high score for specified difficulty or current difficulty if None"""
         if difficulty is None:
             difficulty = self.difficulty
         return self.high_scores[difficulty]
 
-    def get_difficulty_name(self):
+    def get_difficulty_name(self) -> str:
         if self.difficulty == EASY:
             return "Easy"
         elif self.difficulty == MEDIUM:
@@ -153,7 +153,7 @@ class Settings:
         else:
             return "Hard"
 
-    def get_difficulty_color(self):
+    def get_difficulty_color(self) -> tuple[int, int, int]:
         if self.difficulty == EASY:
             return YELLOW
         elif self.difficulty == MEDIUM:
@@ -161,7 +161,7 @@ class Settings:
         else:
             return RED
 
-    def get_pipe_gap(self):
+    def get_pipe_gap(self) -> int:
         # Adjust pipe gap based on difficulty
         if self.difficulty == EASY:
             return 120
@@ -170,7 +170,7 @@ class Settings:
         else:
             return 85
 
-    def get_pipe_frequency(self):
+    def get_pipe_frequency(self) -> int:
         # Adjust pipe frequency based on difficulty
         if self.difficulty == EASY:
             return 1800
@@ -179,7 +179,7 @@ class Settings:
         else:
             return 1200
 
-    def get_gravity(self):
+    def get_gravity(self) -> float:
         # Adjust gravity based on difficulty
         if self.difficulty == EASY:
             return 0.2

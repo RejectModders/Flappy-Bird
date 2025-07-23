@@ -1,33 +1,48 @@
 import random
 
-from src.constants import *
+import pygame
+
+from src.constants import (
+    BIRD_JUMP,
+    EASY,
+    GAME_SETTINGS,
+    HARD,
+    PIPE_VELOCITY,
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
+    load_audio,
+    load_image,
+)
 
 
 class Bird:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.velocity = 0
-        self.animation_index = 0
-        self.frame_count = 0
+    def __init__(self, x: float, y: float) -> None:
+        self.x: float = x
+        self.y: float = y
+        self.velocity: float = 0
+        self.animation_index: int = 0
+        self.frame_count: int = 0
 
         # Load frames based on bird type from settings
         self.update_bird_type()
 
-        self.rect = pygame.Rect(
-            x, y, self.frames[0].get_width(), self.frames[0].get_height()
+        self.rect: pygame.Rect = pygame.Rect(
+            int(x),
+            int(y),
+            self.frames[0].get_width(),
+            self.frames[0].get_height(),
         )
-        self.flap_sound = load_audio("wing.wav")
+        self.flap_sound: pygame.mixer.Sound = load_audio("wing.wav")
 
-    def update_bird_type(self):
+    def update_bird_type(self) -> None:
         bird_type = GAME_SETTINGS.bird_type
-        self.frames = [
+        self.frames: list[pygame.Surface] = [
             load_image(f"{bird_type}bird-downflap.png"),
             load_image(f"{bird_type}bird-midflap.png"),
             load_image(f"{bird_type}bird-upflap.png"),
         ]
 
-    def update(self):
+    def update(self) -> None:
         # Apply gravity based on difficulty
         self.velocity += GAME_SETTINGS.get_gravity()
         self.y += self.velocity
@@ -42,43 +57,46 @@ class Bird:
             self.frame_count = 0
             self.animation_index = (self.animation_index + 1) % 3
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface) -> None:
         # Rotate bird based on velocity (diving angle)
         rotated_bird = pygame.transform.rotate(
             self.frames[self.animation_index], -self.velocity * 3
         )
         surface.blit(rotated_bird, (self.x, self.y))
 
-    def jump(self):
+    def jump(self) -> None:
         self.velocity = BIRD_JUMP
         self.flap_sound.play()
 
-    def reset(self, x, y):
+    def reset(self, x: float, y: float) -> None:
         self.x = x
         self.y = y
         self.velocity = 0
         self.animation_index = 0
         self.frame_count = 0
-        self.rect.x = x
-        self.rect.y = y
+        self.rect.x = int(x)
+        self.rect.y = int(y)
         # Update bird type in case settings changed
         self.update_bird_type()
 
 
 class Pipe:
-    def __init__(self, x):
-        self.x = x
-        self.pipe_color = GAME_SETTINGS.pipe_color
-        self.pipe_img = load_image(f"pipe-{self.pipe_color}.png")
-        self.top_pipe = pygame.transform.flip(self.pipe_img, False, True)
-        self.bottom_pipe = self.pipe_img
-        self.passed = False
+    def __init__(self, x: float) -> None:
+        self.x: float = x
+        self.pipe_color: str = GAME_SETTINGS.pipe_color
+        self.pipe_img: pygame.Surface = load_image(
+            f"pipe-{self.pipe_color}.png"
+        )
+        self.top_pipe: pygame.Surface = pygame.transform.flip(
+            self.pipe_img, False, True
+        )
+        self.bottom_pipe: pygame.Surface = self.pipe_img
+        self.passed: bool = False
 
         # Get appropriate pipe gap based on difficulty
-        self.pipe_gap = GAME_SETTINGS.get_pipe_gap()
+        self.pipe_gap: int = GAME_SETTINGS.get_pipe_gap()
 
         # Calculate the base height to account for ground height
-        base_height = self.pipe_img.get_height()
         ground_y = SCREEN_HEIGHT - load_image("base.png").get_height()
 
         # Improved height range to prevent pipes from appearing too close to ground or ceiling
@@ -95,23 +113,23 @@ class Pipe:
             min_height = 60
             max_height = ground_y - self.pipe_gap - 60
 
-        self.height = random.randint(min_height, max_height)
+        self.height: int = random.randint(min_height, max_height)
 
         # Create rects for collision detection
-        self.top_rect = pygame.Rect(
-            x,
+        self.top_rect: pygame.Rect = pygame.Rect(
+            int(x),
             self.height - self.top_pipe.get_height(),
             self.top_pipe.get_width(),
             self.top_pipe.get_height(),
         )
-        self.bottom_rect = pygame.Rect(
-            x,
+        self.bottom_rect: pygame.Rect = pygame.Rect(
+            int(x),
             self.height + self.pipe_gap,
             self.bottom_pipe.get_width(),
             self.bottom_pipe.get_height(),
         )
 
-    def update(self):
+    def update(self) -> None:
         # Make pipe speed dependent on difficulty
         velocity = PIPE_VELOCITY
         if GAME_SETTINGS.difficulty == HARD:
@@ -120,10 +138,10 @@ class Pipe:
             velocity += 1  # Slower for easy mode
 
         self.x += velocity
-        self.top_rect.x = self.x
-        self.bottom_rect.x = self.x
+        self.top_rect.x = int(self.x)
+        self.bottom_rect.x = int(self.x)
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface) -> None:
         # Draw top pipe
         surface.blit(
             self.top_pipe, (self.x, self.height - self.top_pipe.get_height())
@@ -133,17 +151,17 @@ class Pipe:
 
 
 class Base:
-    def __init__(self):
-        self.image = load_image("base.png")
-        self.width = self.image.get_width()
-        self.x = 0
-        self.y = SCREEN_HEIGHT - self.image.get_height()
-        self.rect = pygame.Rect(
-            self.x, self.y, self.width, self.image.get_height()
+    def __init__(self) -> None:
+        self.image: pygame.Surface = load_image("base.png")
+        self.width: int = self.image.get_width()
+        self.x: float = 0
+        self.y: int = SCREEN_HEIGHT - self.image.get_height()
+        self.rect: pygame.Rect = pygame.Rect(
+            int(self.x), self.y, self.width, self.image.get_height()
         )
-        self.scroll_speed = 2  # Base scroll speed
+        self.scroll_speed: float = 2  # Base scroll speed
 
-    def update(self):
+    def update(self) -> None:
         # Adjust speed based on difficulty
         speed_modifier = 1.0
         if GAME_SETTINGS.difficulty == HARD:
@@ -159,9 +177,9 @@ class Base:
             self.x = 0
 
         # Update collision rectangle
-        self.rect.x = self.x
+        self.rect.x = int(self.x)
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface) -> None:
         # Draw first copy of the base
         surface.blit(self.image, (self.x, self.y))
 
