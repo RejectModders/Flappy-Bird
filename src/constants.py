@@ -46,18 +46,64 @@ CLOCK = pygame.time.Clock()
 
 # Load assets
 def load_image(name: str) -> pygame.Surface:
+    """
+    Load an image from the assets/sprites directory.
+
+    Parameters
+    ----------
+    name : str
+        The filename of the image to load.
+
+    Returns
+    -------
+    pygame.Surface
+        The loaded image as a pygame Surface with alpha channel.
+    """
     return pygame.image.load(
         os.path.join("assets", "sprites", name)
     ).convert_alpha()
 
 
 def load_audio(name: str) -> pygame.mixer.Sound:
+    """
+    Load an audio file from the assets/audio directory.
+
+    Parameters
+    ----------
+    name : str
+        The filename of the audio file to load.
+
+    Returns
+    -------
+    pygame.mixer.Sound
+        The loaded audio as a pygame Sound object.
+    """
     return pygame.mixer.Sound(os.path.join("assets", "audio", name))
 
 
 # Game settings and high score manager
 class Settings:
+    """
+    Manages game settings and high scores, including difficulty, bird type, and pipe color.
+
+    Attributes
+    ----------
+    settings_file : str
+        The filename for saving and loading settings.
+    difficulty : int
+        The current difficulty level.
+    high_scores : dict of int to int
+        High scores for each difficulty level.
+    bird_type : str
+        The current bird type.
+    pipe_color : str
+        The current pipe color.
+    """
+
     def __init__(self) -> None:
+        """
+        Initialize the Settings object, loading settings from file if available.
+        """
         self.settings_file: str = "game_data.json"
         self.difficulty: int = EASY
 
@@ -69,6 +115,12 @@ class Settings:
         self.load_settings()
 
     def load_settings(self) -> None:
+        """
+        Load settings and high scores from the settings file.
+
+        Loads difficulty, high scores, bird type, and pipe color.
+        Handles backward compatibility with older save formats.
+        """
         try:
             if os.path.exists(self.settings_file):
                 with open(self.settings_file, "r") as f:
@@ -103,6 +155,11 @@ class Settings:
             # Use defaults if file can't be loaded
 
     def save_settings(self) -> None:
+        """
+        Save current settings and high scores to the settings file.
+
+        Saves difficulty, high scores, bird type, and pipe color.
+        """
         try:
             with open(self.settings_file, "w") as f:
                 data = {
@@ -116,6 +173,14 @@ class Settings:
             print(f"Error saving settings: {e}")
 
     def set_difficulty(self, difficulty: int) -> None:
+        """
+        Set the game difficulty and update bird and pipe colors accordingly.
+
+        Parameters
+        ----------
+        difficulty : int
+            The difficulty level to set (EASY, MEDIUM, or HARD).
+        """
         self.difficulty = difficulty
 
         # Update bird and pipe colors based on difficulty
@@ -132,6 +197,19 @@ class Settings:
         self.save_settings()
 
     def update_high_score(self, score: int) -> bool:
+        """
+        Update the high score for the current difficulty if the given score is higher.
+
+        Parameters
+        ----------
+        score : int
+            The score to compare with the current high score.
+
+        Returns
+        -------
+        bool
+            True if the high score was updated, False otherwise.
+        """
         current_difficulty = self.difficulty
         if score > self.high_scores[current_difficulty]:
             self.high_scores[current_difficulty] = score
@@ -140,12 +218,32 @@ class Settings:
         return False
 
     def get_high_score(self, difficulty: int | None = None) -> int:
-        """Get high score for specified difficulty or current difficulty if None"""
+        """
+        Get the high score for a specified difficulty or the current difficulty if not specified.
+
+        Parameters
+        ----------
+        difficulty : int or None, optional
+            The difficulty level to get the high score for. If None, uses the current difficulty.
+
+        Returns
+        -------
+        int
+            The high score for the specified or current difficulty.
+        """
         if difficulty is None:
             difficulty = self.difficulty
         return self.high_scores[difficulty]
 
     def get_difficulty_name(self) -> str:
+        """
+        Get the name of the current difficulty level.
+
+        Returns
+        -------
+        str
+            The name of the current difficulty ("Easy", "Medium", or "Hard").
+        """
         if self.difficulty == EASY:
             return "Easy"
         elif self.difficulty == MEDIUM:
@@ -154,6 +252,14 @@ class Settings:
             return "Hard"
 
     def get_difficulty_color(self) -> tuple[int, int, int]:
+        """
+        Get the color associated with the current difficulty level.
+
+        Returns
+        -------
+        tuple of int
+            The RGB color tuple for the current difficulty.
+        """
         if self.difficulty == EASY:
             return YELLOW
         elif self.difficulty == MEDIUM:
@@ -162,7 +268,14 @@ class Settings:
             return RED
 
     def get_pipe_gap(self) -> int:
-        # Adjust pipe gap based on difficulty
+        """
+        Get the pipe gap value based on the current difficulty.
+
+        Returns
+        -------
+        int
+            The pipe gap for the current difficulty.
+        """
         if self.difficulty == EASY:
             return 120
         elif self.difficulty == MEDIUM:
@@ -171,7 +284,14 @@ class Settings:
             return 85
 
     def get_pipe_frequency(self) -> int:
-        # Adjust pipe frequency based on difficulty
+        """
+        Get the pipe frequency value based on the current difficulty.
+
+        Returns
+        -------
+        int
+            The pipe frequency for the current difficulty.
+        """
         if self.difficulty == EASY:
             return 1800
         elif self.difficulty == MEDIUM:
@@ -180,7 +300,14 @@ class Settings:
             return 1200
 
     def get_gravity(self) -> float:
-        # Adjust gravity based on difficulty
+        """
+        Get the gravity value based on the current difficulty.
+
+        Returns
+        -------
+        float
+            The gravity for the current difficulty.
+        """
         if self.difficulty == EASY:
             return 0.2
         elif self.difficulty == MEDIUM:

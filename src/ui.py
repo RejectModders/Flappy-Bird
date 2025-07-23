@@ -26,7 +26,14 @@ from src.constants import (
 
 
 def time_based_background() -> pygame.Surface:
-    """Returns background based on local time (day or night)."""
+    """
+    Return the background image based on the local time (day or night).
+
+    Returns
+    -------
+    pygame.Surface
+        The loaded background image as a pygame Surface. Daytime background is used between 6 AM and 6 PM, otherwise night background is used.
+    """
     current_hour = datetime.datetime.now().hour
     # Day time is typically between 6 AM and 6 PM (6-18)
     is_daytime = 6 <= current_hour < 18

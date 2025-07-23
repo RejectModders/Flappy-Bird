@@ -16,7 +16,36 @@ from src.constants import (
 
 
 class Bird:
+    """
+    Represents the player-controlled bird in the game.
+
+    Methods
+    -------
+    __init__(x, y)
+        Initializes the Bird object at the given coordinates.
+    update_bird_type()
+        Updates the bird's animation frames based on the current bird type in settings.
+    update()
+        Updates the bird's position, velocity, and animation state.
+    draw(surface)
+        Draws the bird on the given surface with rotation based on velocity.
+    jump()
+        Makes the bird jump by setting its velocity and playing the flap sound.
+    reset(x, y)
+        Resets the bird's position, velocity, and animation state.
+    """
+
     def __init__(self, x: float, y: float) -> None:
+        """
+        Initialize the Bird object at the specified coordinates.
+
+        Parameters
+        ----------
+        x : float
+            The initial x-coordinate of the bird.
+        y : float
+            The initial y-coordinate of the bird.
+        """
         self.x: float = x
         self.y: float = y
         self.velocity: float = 0
@@ -35,6 +64,9 @@ class Bird:
         self.flap_sound: pygame.mixer.Sound = load_audio("wing.wav")
 
     def update_bird_type(self) -> None:
+        """
+        Update the bird's animation frames based on the current bird type in settings.
+        """
         bird_type = GAME_SETTINGS.bird_type
         self.frames: list[pygame.Surface] = [
             load_image(f"{bird_type}bird-downflap.png"),
@@ -43,6 +75,9 @@ class Bird:
         ]
 
     def update(self) -> None:
+        """
+        Update the bird's position, velocity, and animation state.
+        """
         # Apply gravity based on difficulty
         self.velocity += GAME_SETTINGS.get_gravity()
         self.y += self.velocity
@@ -58,6 +93,14 @@ class Bird:
             self.animation_index = (self.animation_index + 1) % 3
 
     def draw(self, surface: pygame.Surface) -> None:
+        """
+        Draw the bird on the given surface with rotation based on velocity.
+
+        Parameters
+        ----------
+        surface : pygame.Surface
+            The surface to draw the bird on.
+        """
         # Rotate bird based on velocity (diving angle)
         rotated_bird = pygame.transform.rotate(
             self.frames[self.animation_index], -self.velocity * 3
@@ -65,10 +108,23 @@ class Bird:
         surface.blit(rotated_bird, (self.x, self.y))
 
     def jump(self) -> None:
+        """
+        Make the bird jump by setting its velocity and playing the flap sound.
+        """
         self.velocity = BIRD_JUMP
         self.flap_sound.play()
 
     def reset(self, x: float, y: float) -> None:
+        """
+        Reset the bird's position, velocity, and animation state.
+
+        Parameters
+        ----------
+        x : float
+            The new x-coordinate for the bird.
+        y : float
+            The new y-coordinate for the bird.
+        """
         self.x = x
         self.y = y
         self.velocity = 0
@@ -81,7 +137,28 @@ class Bird:
 
 
 class Pipe:
+    """
+    Represents a pair of pipes (top and bottom) in the game.
+
+    Methods
+    -------
+    __init__(x)
+        Initializes the Pipe object at the given x-coordinate.
+    update()
+        Updates the pipe's position based on the current difficulty.
+    draw(surface)
+        Draws the top and bottom pipes on the given surface.
+    """
+
     def __init__(self, x: float) -> None:
+        """
+        Initialize the Pipe object at the specified x-coordinate.
+
+        Parameters
+        ----------
+        x : float
+            The initial x-coordinate of the pipe.
+        """
         self.x: float = x
         self.pipe_color: str = GAME_SETTINGS.pipe_color
         self.pipe_img: pygame.Surface = load_image(
@@ -130,6 +207,9 @@ class Pipe:
         )
 
     def update(self) -> None:
+        """
+        Update the pipe's position based on the current difficulty.
+        """
         # Make pipe speed dependent on difficulty
         velocity = PIPE_VELOCITY
         if GAME_SETTINGS.difficulty == HARD:
@@ -142,6 +222,14 @@ class Pipe:
         self.bottom_rect.x = int(self.x)
 
     def draw(self, surface: pygame.Surface) -> None:
+        """
+        Draw the top and bottom pipes on the given surface.
+
+        Parameters
+        ----------
+        surface : pygame.Surface
+            The surface to draw the pipes on.
+        """
         # Draw top pipe
         surface.blit(
             self.top_pipe, (self.x, self.height - self.top_pipe.get_height())
@@ -151,7 +239,23 @@ class Pipe:
 
 
 class Base:
+    """
+    Represents the scrolling ground base in the game.
+
+    Methods
+    -------
+    __init__()
+        Initializes the Base object.
+    update()
+        Updates the base's position to create a scrolling effect.
+    draw(surface)
+        Draws the base on the given surface, creating a seamless loop.
+    """
+
     def __init__(self) -> None:
+        """
+        Initialize the Base object.
+        """
         self.image: pygame.Surface = load_image("base.png")
         self.width: int = self.image.get_width()
         self.x: float = 0
@@ -162,6 +266,9 @@ class Base:
         self.scroll_speed: float = 2  # Base scroll speed
 
     def update(self) -> None:
+        """
+        Update the base's position to create a scrolling effect.
+        """
         # Adjust speed based on difficulty
         speed_modifier = 1.0
         if GAME_SETTINGS.difficulty == HARD:
@@ -180,6 +287,14 @@ class Base:
         self.rect.x = int(self.x)
 
     def draw(self, surface: pygame.Surface) -> None:
+        """
+        Draw the base on the given surface, creating a seamless loop.
+
+        Parameters
+        ----------
+        surface : pygame.Surface
+            The surface to draw the base on.
+        """
         # Draw first copy of the base
         surface.blit(self.image, (self.x, self.y))
 
