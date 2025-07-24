@@ -8,7 +8,8 @@ A Python implementation of the classic Flappy Bird game with enhanced features a
 
 ## 🎬 Demo Video
 
-Watch the game in action:  
+Watch the game in action:
+
 https://github.com/user-attachments/assets/7c9d51fc-61c8-4ba0-aa08-0544a38d2b2b
 
 ---
@@ -139,7 +140,6 @@ Game assets are from [samuelcust/flappy-bird-assets](https://github.com/samuelcu
 
 Pull requests and suggestions are welcome! Please open an issue for major changes.
 
----
 
 ## 📄 License
 
