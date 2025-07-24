@@ -1,36 +1,32 @@
-from typing import Any, override
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, override
 
 import pygame
 from game_state import State
 
 from src.constants import SCREEN_HEIGHT, load_audio, load_image
-from src.screens.base_screen import BaseScreen
 from src.ui import time_based_background
 
+if TYPE_CHECKING:
+    from typing import Any
+    from pygame import Surface
+    from pygame.mixer import Sound
 
-class LoadingScreen(BaseScreen, state_name="loading"):
+
+class LoadingScreen(State, state_name="loading"):
     """
     Loading screen shown when the game first starts.
 
     This screen displays a logo and a moving base while assets are loaded.
     """
 
-    @override
-    def on_setup(self) -> None:
-        """
-        Perform initial setup when the state is first loaded into the StateManager.
+    def __init__(self) -> None:
+        self.background: Surface = time_based_background()
+        self.logo: Surface = load_image("message.png")
 
-        Initializes the background, logo, base, sound, and base animation properties.
-
-        Returns
-        -------
-        None
-        """
-        self.background: pygame.Surface = time_based_background()
-        self.logo: pygame.Surface = load_image("message.png")
-
-        self.base: pygame.Surface = load_image(("base.png")).convert_alpha()
-        self.swoosh_sound: pygame.mixer.Sound = load_audio("swoosh.wav")
+        self.base: Surface = load_image(("base.png")).convert_alpha()
+        self.swoosh_sound: Sound = load_audio("swoosh.wav")
 
         self.base_width: int = self.base.get_width()
         self.base_height: int = self.base.get_height()
@@ -74,7 +70,7 @@ class LoadingScreen(BaseScreen, state_name="loading"):
             self.manager.is_running = False
 
     @override
-    def process_update(self, dt: float, args: tuple[Any, ...]) -> None:  # pyright: ignore[reportIncompatibleMethodOverride]
+    def process_update(self, dt: float, *args: Any) -> None:
         """
         Update the loading screen state and render.
 
