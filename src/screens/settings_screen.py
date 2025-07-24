@@ -330,6 +330,29 @@ class SettingsScreen(State, state_name="settings"):
         if self.base_x <= -self.base_width:
             self.base_x = 0
 
+        if self.active_tab == "gameplay":
+            self.gameplay_tab.hover_color = (
+                min(BUTTON_PRIMARY_COLOR[0] + 30, 255),
+                min(BUTTON_PRIMARY_COLOR[1] + 30, 255),
+                min(BUTTON_PRIMARY_COLOR[2] + 30, 255),
+            )
+            self.audio_tab.hover_color = (
+                80,
+                80,
+                80,
+            )  # Lighter gray when hovering
+        else:
+            self.gameplay_tab.hover_color = (
+                80,
+                80,
+                80,
+            )  # Lighter gray when hovering
+            self.audio_tab.hover_color = (
+                min(BUTTON_PRIMARY_COLOR[0] + 30, 255),
+                min(BUTTON_PRIMARY_COLOR[1] + 30, 255),
+                min(BUTTON_PRIMARY_COLOR[2] + 30, 255),
+            )
+
         self.gameplay_tab.update(mouse_pos)
         self.audio_tab.update(mouse_pos)
 
