@@ -10,6 +10,20 @@ A Python implementation of the classic Flappy Bird game with enhanced features a
 > - Ensure you have Python 3.12.x installed before proceeding. Using any other version may result in critical errors or unexpected behavior.
 > - [Download Python 3.12.x](https://www.python.org/downloads/) if you do not already have it installed.
 
+## ⚠️ Windows Executable Download Instructions
+
+> [!CAUTION]
+> **How to run on Windows:**
+>
+> - **Version 2.0.0 and below:**  
+>   Download the all-in-one `.exe` file and run it directly. All assets are bundled inside the executable.
+>
+> - **Version 2.1.0 and above:**  
+>   Download the provided `.zip` file, extract all contents, and then run the `.exe` inside the extracted folder.  
+>   This method is safer for Windows and ensures all assets and dependencies are loaded correctly.
+>
+> If you encounter issues running the executable, make sure your antivirus is not blocking it and that you have extracted all files before launching.
+
 ## 📦 Requirements
 
 * Python 3.12 (strictly required)
