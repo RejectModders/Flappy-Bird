@@ -13,8 +13,6 @@ from src.ui import Button, time_based_background
 from src.ui_constants import BUTTON_PRIMARY_COLOR, BUTTON_SECONDARY_COLOR
 
 if TYPE_CHECKING:
-    from typing import Any
-
     from pygame import Surface
     from pygame.mixer import Sound
 

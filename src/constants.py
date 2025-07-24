@@ -3,7 +3,6 @@ import sys
 
 import pygame
 
-from src.settings import GAME_SETTINGS
 
 # Initialize pygame
 pygame.init()
@@ -105,6 +104,7 @@ def load_audio(name: str) -> pygame.mixer.Sound:
             resource_path(os.path.join("assets", "audio", name))
         )
         _sound_cache[name] = sound
+        from src.settings import GAME_SETTINGS
 
         sound.set_volume(GAME_SETTINGS.volume)
     return _sound_cache[name]

@@ -69,7 +69,7 @@ class LoadingScreen(State, state_name="loading"):
             self.manager.is_running = False
 
     @override
-    def process_update(self, dt: float) -> None:
+    def process_update(self, dt: float) -> None: # pyright: ignore[reportIncompatibleMethodOverride]
         """
         Update the loading screen state and render.
 
