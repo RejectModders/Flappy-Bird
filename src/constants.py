@@ -3,7 +3,6 @@ import sys
 
 import pygame
 
-
 # Initialize pygame
 pygame.init()
 pygame.mixer.init()
