@@ -1,6 +1,9 @@
-from typing import Any, override
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, override
 
 import pygame
+from game_state import State
 from pygame.locals import K_ESCAPE, KEYDOWN, QUIT
 
 from src.constants import (
@@ -16,7 +19,6 @@ from src.constants import (
     load_audio,
     load_image,
 )
-from src.screens.base_screen import BaseScreen
 from src.settings import GAME_SETTINGS
 from src.ui import Button, time_based_background
 from src.ui_constants import (
@@ -26,27 +28,23 @@ from src.ui_constants import (
     FONT_SMALL,
 )
 
+if TYPE_CHECKING:
+    from pygame import Surface
+    from pygame.event import Event
+    from pygame.font import Font
+    from pygame.mixer import Sound
 
-class StatsScreen(BaseScreen, state_name="stats"):
+
+class StatsScreen(State, state_name="stats"):
     """
     Statistics screen for displaying high scores and achievements.
 
     Shows high scores for each difficulty and achievement status.
     """
 
-    @override
-    def on_setup(self) -> None:
-        """
-        Perform initial setup when the state is first loaded into the StateManager.
-
-        Initializes background, base, panel properties, fonts, back button, and sound.
-
-        Returns
-        -------
-        None
-        """
-        self.background: pygame.Surface = time_based_background()
-        self.base: pygame.Surface = load_image(("base.png")).convert_alpha()
+    def __init__(self) -> None:
+        self.background: Surface = time_based_background()
+        self.base: Surface = load_image(("base.png")).convert_alpha()
 
         self.base_width: int = self.base.get_width()
         self.base_height: int = self.base.get_height()
@@ -73,20 +71,20 @@ class StatsScreen(BaseScreen, state_name="stats"):
             BUTTON_SECONDARY_COLOR,
         )
 
-        self.title_font: pygame.font.Font = FONT_LARGE
-        self.font: pygame.font.Font = FONT_SMALL
-        self.small_font: pygame.font.Font = pygame.font.Font(None, 20)
+        self.title_font: Font = FONT_LARGE
+        self.font: Font = FONT_SMALL
+        self.small_font: Font = pygame.font.Font(None, 20)
 
-        self.swoosh_sound: pygame.mixer.Sound = load_audio("swoosh.wav")
+        self.swoosh_sound: Sound = load_audio("swoosh.wav")
 
     @override
-    def process_event(self, event: pygame.event.Event) -> None:
+    def process_event(self, event: Event) -> None:
         """
         Handle pygame events for the stats screen.
 
         Parameters
         ----------
-        event : pygame.event.Event
+        event : Event
             Pygame event to process.
 
         Returns
@@ -105,7 +103,7 @@ class StatsScreen(BaseScreen, state_name="stats"):
                 self.manager.change_state("main_menu")
 
     @override
-    def process_update(self, dt: float, args: tuple[Any, ...]) -> None:  # pyright: ignore[reportIncompatibleMethodOverride]
+    def process_update(self, dt: float) -> None:  # pyright: ignore[reportIncompatibleMethodOverride]
         """
         Update the stats screen state and render.
 
@@ -113,8 +111,6 @@ class StatsScreen(BaseScreen, state_name="stats"):
         ----------
         dt : float
             Time delta since last update in seconds.
-        args : tuple[Any, ...]
-            Additional arguments passed from the state manager.
 
         Returns
         -------
