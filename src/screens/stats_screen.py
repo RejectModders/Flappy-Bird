@@ -19,6 +19,12 @@ from src.constants import (
 from src.screens.base_screen import BaseScreen
 from src.settings import GAME_SETTINGS
 from src.ui import Button, time_based_background
+from src.ui_constants import (
+    BUTTON_SECONDARY_COLOR,
+    BUTTON_TEXT_COLOR,
+    FONT_LARGE,
+    FONT_SMALL,
+)
 
 
 class StatsScreen(BaseScreen, state_name="stats"):
@@ -63,12 +69,12 @@ class StatsScreen(BaseScreen, state_name="stats"):
             button_width,
             button_height,
             "Back",
-            WHITE,
-            (100, 100, 100),
+            BUTTON_TEXT_COLOR,
+            BUTTON_SECONDARY_COLOR,
         )
 
-        self.title_font: pygame.font.Font = pygame.font.Font(None, 36)
-        self.font: pygame.font.Font = pygame.font.Font(None, 24)
+        self.title_font: pygame.font.Font = FONT_LARGE
+        self.font: pygame.font.Font = FONT_SMALL
         self.small_font: pygame.font.Font = pygame.font.Font(None, 20)
 
         self.swoosh_sound: pygame.mixer.Sound = load_audio("swoosh.wav")

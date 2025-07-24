@@ -2,7 +2,14 @@ import datetime
 
 import pygame
 
-from src.constants import BLACK, GREEN, SCREEN_WIDTH, WHITE, load_image
+from src.constants import BLACK, SCREEN_WIDTH, load_image
+from src.ui_constants import (
+    BUTTON_PRIMARY_COLOR,
+    BUTTON_TEXT_COLOR,
+    FONT_LARGE,
+    FONT_SMALL,
+    HIGH_SCORE_COLOR,
+)
 
 
 def time_based_background() -> pygame.Surface:
@@ -31,8 +38,8 @@ class Button:
         width: int,
         height: int,
         text: str,
-        text_color: tuple[int, int, int] = WHITE,
-        bg_color: tuple[int, int, int] = GREEN,
+        text_color: tuple[int, int, int] = BUTTON_TEXT_COLOR,
+        bg_color: tuple[int, int, int] = BUTTON_PRIMARY_COLOR,
         hover_color: tuple[int, int, int] | None = None,
     ) -> None:
         """
@@ -51,9 +58,9 @@ class Button:
         text : str
             Text to display on the button.
         text_color : tuple[int, int, int], optional
-            RGB color for the text, by default WHITE.
+            RGB color for the text, by default BUTTON_TEXT_COLOR.
         bg_color : tuple[int, int, int], optional
-            RGB color for the button background, by default GREEN.
+            RGB color for the button background, by default BUTTON_PRIMARY_COLOR.
         hover_color : tuple[int, int, int], optional
             RGB color for the button when hovered, by default computed from bg_color.
         """
@@ -67,7 +74,7 @@ class Button:
             min(bg_color[2] + 30, 255),
         )
         self.is_hovered: bool = False
-        self.font: pygame.font.Font = pygame.font.Font(None, 26)
+        self.font: pygame.font.Font = FONT_SMALL
 
     def update(self, mouse_pos: tuple[int, int]) -> None:
         """
@@ -125,7 +132,7 @@ class ScoreDisplay:
         """
         Initialize a ScoreDisplay instance.
         """
-        self.font: pygame.font.Font = pygame.font.Font(None, 50)
+        self.font: pygame.font.Font = FONT_LARGE
         self.digit_images: list[pygame.Surface] = [
             load_image(f"{i}.png") for i in range(10)
         ]
@@ -181,7 +188,9 @@ class ScoreDisplay:
         y : int
             Y coordinate.
         """
-        text_surf = self.font.render(f"{text}: {score}", True, WHITE)
+        text_surf = self.font.render(
+            f"{text}: {score}", True, HIGH_SCORE_COLOR
+        )
         surface.blit(text_surf, (x, y))
 
 
@@ -227,8 +236,8 @@ class Slider:
         max_value: float = 1.0,
         initial_value: float = 0.5,
         track_color: tuple[int, int, int] = (100, 100, 100),
-        handle_color: tuple[int, int, int] = WHITE,
-        active_color: tuple[int, int, int] = GREEN,
+        handle_color: tuple[int, int, int] = BUTTON_TEXT_COLOR,
+        active_color: tuple[int, int, int] = BUTTON_PRIMARY_COLOR,
     ) -> None:
         """
         Initialize a Slider instance.

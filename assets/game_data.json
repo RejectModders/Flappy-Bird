@@ -1,11 +1,11 @@
 {
     "difficulty": 0,
     "high_scores": {
-        "0": 8,
+        "0": 0,
         "1": 0,
         "2": 0
     },
     "bird_type": "yellow",
     "pipe_color": "green",
-    "volume": 0.5
+    "volume": 0.50
 }

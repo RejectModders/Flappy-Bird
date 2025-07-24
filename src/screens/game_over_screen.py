@@ -8,6 +8,15 @@ from src.constants import SCREEN_HEIGHT, SCREEN_WIDTH, load_audio, load_image
 from src.screens.base_screen import BaseScreen
 from src.settings import GAME_SETTINGS
 from src.ui import Button, ScoreDisplay, time_based_background
+from src.ui_constants import (
+    BUTTON_PRIMARY_COLOR,
+    BUTTON_SECONDARY_COLOR,
+    FONT_LARGE,
+    FONT_SMALL,
+    HIGH_SCORE_COLOR,
+    HIGH_SCORE_FLASH_SPEED,
+    MARGIN_LARGE,
+)
 
 
 class GameOverScreen(BaseScreen, state_name="game_over"):
@@ -41,41 +50,43 @@ class GameOverScreen(BaseScreen, state_name="game_over"):
 
         button_width = 120
         button_height = 40
-        button_spacing = 60
+        button_spacing = 20
         center_x = SCREEN_WIDTH // 2 - button_width // 2
-        button_y_start = SCREEN_HEIGHT - self.base_height - 150
 
-        self.green_color = (76, 175, 80)
-        self.blue_color = (66, 133, 244)
+        # We'll set button positions in _render to ensure proper layout
+        # The actual Y position will be calculated during rendering
+        self.button_width: int = button_width
+        self.button_height: int = button_height
+        self.button_spacing: int = button_spacing
+        self.center_x: int = center_x
 
         self.play_again_button: Button = Button(
             center_x,
-            button_y_start,
+            0,  # Temporary Y position, will be set in _render
             button_width,
             button_height,
             "Retry",
-            bg_color=self.green_color,
+            bg_color=BUTTON_PRIMARY_COLOR,
         )
         self.menu_button: Button = Button(
             center_x,
-            button_y_start + button_spacing,
+            0,  # Temporary Y position, will be set in _render
             button_width,
             button_height,
             "Main Menu",
-            bg_color=self.blue_color,
+            bg_color=BUTTON_SECONDARY_COLOR,
         )
 
         self.swoosh_sound: pygame.mixer.Sound = load_audio("swoosh.wav")
 
         self.score: int = 0
-        # Initialize high score in on_setup to ensure it exists before set_score is called
         self.high_score: int = GAME_SETTINGS.high_scores[
             GAME_SETTINGS.difficulty
         ]
         self.is_new_high_score: bool = False
         self.high_score_flash_timer: float = 0
         self.high_score_visible: bool = True
-        self.high_score_flash_speed: float = 0.5  # Flash every 0.5 seconds
+        self.high_score_flash_speed: float = HIGH_SCORE_FLASH_SPEED
 
     @override
     def on_enter(self, prevous_state: State | None = None) -> None:
@@ -197,38 +208,47 @@ class GameOverScreen(BaseScreen, state_name="game_over"):
         None
         """
         self.window.blit(self.background, (0, 0))
-
         self.window.blit(self.base, (0, self.base_y))
 
         game_over_x = (SCREEN_WIDTH - self.game_over_img.get_width()) // 2
         game_over_y = 100
         self.window.blit(self.game_over_img, (game_over_x, game_over_y))
 
-        score_y = game_over_y + self.game_over_img.get_height() + 30
+        score_y = game_over_y + self.game_over_img.get_height() + MARGIN_LARGE
         self.score_display.draw_score(self.window, self.score, y=score_y)
 
         high_score_y = score_y + 50
-        high_score_font = pygame.font.Font(None, 26)
-
-        high_score_text = high_score_font.render(
-            f"High Score: {self.high_score}", True, (255, 255, 255)
+        high_score_text = FONT_SMALL.render(
+            f"High Score: {self.high_score}", True, HIGH_SCORE_COLOR
         )
         high_score_x = (SCREEN_WIDTH - high_score_text.get_width()) // 2
         self.window.blit(high_score_text, (high_score_x, high_score_y))
 
-        if self.is_new_high_score:
-            if self.high_score_visible:
-                new_high_score_font = pygame.font.Font(None, 36)
-                new_high_score_text = new_high_score_font.render(
-                    "New High Score!", True, (255, 255, 0)
-                )
-                new_high_score_x = (
-                    SCREEN_WIDTH - new_high_score_text.get_width()
-                ) // 2
-                new_high_score_y = high_score_y + 40
-                self.window.blit(
-                    new_high_score_text, (new_high_score_x, new_high_score_y)
-                )
+        new_high_score_y = high_score_y + 40
+        if self.is_new_high_score and self.high_score_visible:
+            new_high_score_text = FONT_LARGE.render(
+                "New High Score!", True, HIGH_SCORE_COLOR
+            )
+            new_high_score_x = (
+                SCREEN_WIDTH - new_high_score_text.get_width()
+            ) // 2
+            self.window.blit(
+                new_high_score_text, (new_high_score_x, new_high_score_y)
+            )
+
+        min_button_y = new_high_score_y + (
+            60 if self.is_new_high_score else 20
+        )
+        available_height = self.base_y - min_button_y
+
+        button_total_height = (2 * self.button_height) + self.button_spacing
+        button_y_offset = (available_height - button_total_height) // 2
+
+        play_again_y = min_button_y + button_y_offset
+        menu_y = play_again_y + self.button_height + self.button_spacing
+
+        self.play_again_button.rect.y = play_again_y
+        self.menu_button.rect.y = menu_y
 
         self.play_again_button.draw(self.window)
         self.menu_button.draw(self.window)

@@ -5,16 +5,11 @@ import pygame
 from game_state import State
 from pygame.locals import K_ESCAPE, KEYDOWN, QUIT
 
-from src.constants import (
-    GREEN,
-    SCREEN_HEIGHT,
-    SCREEN_WIDTH,
-    load_audio,
-    load_image,
-)
+from src.constants import SCREEN_HEIGHT, SCREEN_WIDTH, load_audio, load_image
 from src.screens.base_screen import BaseScreen
 from src.settings import GAME_SETTINGS
 from src.ui import Button, time_based_background
+from src.ui_constants import BUTTON_PRIMARY_COLOR, BUTTON_SECONDARY_COLOR
 
 
 class MainMenuScreen(BaseScreen, state_name="main_menu"):
@@ -127,7 +122,7 @@ class MainMenuScreen(BaseScreen, state_name="main_menu"):
             button_width,
             button_height,
             "Play",
-            bg_color=GREEN,
+            bg_color=BUTTON_PRIMARY_COLOR,
         )
 
         self.stats_button: Button = Button(
@@ -136,7 +131,7 @@ class MainMenuScreen(BaseScreen, state_name="main_menu"):
             button_width,
             button_height,
             "Stats",
-            bg_color=(91, 155, 213),
+            bg_color=BUTTON_SECONDARY_COLOR,
         )
 
         self.settings_button: Button = Button(
@@ -145,7 +140,7 @@ class MainMenuScreen(BaseScreen, state_name="main_menu"):
             button_width,
             button_height,
             "Settings",
-            bg_color=(44, 62, 80),
+            bg_color=BUTTON_SECONDARY_COLOR,
         )
 
         # Load sounds

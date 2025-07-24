@@ -20,6 +20,12 @@ from src.constants import (
 from src.screens.base_screen import BaseScreen
 from src.settings import GAME_SETTINGS
 from src.ui import Button, Slider, time_based_background
+from src.ui_constants import (
+    BUTTON_PRIMARY_COLOR,
+    BUTTON_SECONDARY_COLOR,
+    FONT_LARGE,
+    FONT_SMALL,
+)
 
 
 class SettingsScreen(BaseScreen, state_name="settings"):
@@ -57,18 +63,19 @@ class SettingsScreen(BaseScreen, state_name="settings"):
             50,
         )
 
-        self.title_font: pygame.font.Font = pygame.font.Font(None, 36)
-        self.font: pygame.font.Font = pygame.font.Font(None, 24)
+        self.title_font: pygame.font.Font = FONT_LARGE
+        self.font: pygame.font.Font = FONT_SMALL
         self.active_tab: Literal["gameplay", "audio"] = "gameplay"
 
         self.tab_width: int = self.panel_width // 2
         self.tab_height: int = 40
 
-        # Determine button colors based on initial active tab
         gameplay_color = (
-            (80, 80, 80) if self.active_tab == "gameplay" else (50, 50, 50)
+            BUTTON_PRIMARY_COLOR
+            if self.active_tab == "gameplay"
+            else (50, 50, 50)
         )
-        audio_color = (80, 80, 80)
+        audio_color = (50, 50, 50)
 
         self.gameplay_tab: Button = Button(
             self.panel_position[0],
@@ -155,7 +162,7 @@ class SettingsScreen(BaseScreen, state_name="settings"):
             nav_button_width,
             40,
             "Save",
-            bg_color=GREEN,
+            bg_color=BUTTON_PRIMARY_COLOR,
         )
 
         self.back_button: Button = Button(
@@ -164,7 +171,7 @@ class SettingsScreen(BaseScreen, state_name="settings"):
             nav_button_width,
             40,
             "Back",
-            bg_color=(70, 70, 70),
+            bg_color=BUTTON_SECONDARY_COLOR,
         )
 
         self.initial_volume: float = GAME_SETTINGS.volume
@@ -417,11 +424,11 @@ class SettingsScreen(BaseScreen, state_name="settings"):
         self.window.blit(panel_surf, self.panel_position)
 
         if self.active_tab == "gameplay":
-            self.gameplay_tab.bg_color = (80, 80, 80)
+            self.gameplay_tab.bg_color = BUTTON_PRIMARY_COLOR
             self.audio_tab.bg_color = (50, 50, 50)
         else:
             self.gameplay_tab.bg_color = (50, 50, 50)
-            self.audio_tab.bg_color = (80, 80, 80)
+            self.audio_tab.bg_color = BUTTON_PRIMARY_COLOR
 
         self.gameplay_tab.draw(self.window)
         self.audio_tab.draw(self.window)
@@ -439,7 +446,7 @@ class SettingsScreen(BaseScreen, state_name="settings"):
             self._render_audio_tab()
 
         if self.has_changes:
-            self.save_button.bg_color = GREEN
+            self.save_button.bg_color = BUTTON_PRIMARY_COLOR
         else:
             self.save_button.bg_color = (70, 70, 70)
 
