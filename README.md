@@ -1,6 +1,3 @@
-Here’s an improved and finalized `README.md` with a better layout, a dedicated section for your video, clearer instructions, and some extra polish. The CAUTION blocks and all important info are preserved.
-
-```markdown
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
 
 # 🐦 Flappy Bird Python
