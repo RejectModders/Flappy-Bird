@@ -194,7 +194,7 @@ class MainMenuScreen(State, state_name="main_menu"):
                 self.manager.change_state("stats")
 
     @override
-    def process_update(self, dt: float, *args: Any) -> None:  # pyright: ignore[reportIncompatibleMethodOverride]
+    def process_update(self, dt: float) -> None:  # pyright: ignore[reportIncompatibleMethodOverride]
         """
         Update the main menu state and render.
 

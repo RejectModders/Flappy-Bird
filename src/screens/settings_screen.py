@@ -30,7 +30,7 @@ from src.ui_constants import (
 )
 
 if TYPE_CHECKING:
-    from typing import Any, Literal
+    from typing import Literal
 
     from pygame import Surface
     from pygame.event import Event
@@ -309,7 +309,7 @@ class SettingsScreen(State, state_name="settings"):
             GAME_SETTINGS.pipe_color = "red"
 
     @override
-    def process_update(self, dt: float, *args: Any) -> None:  # pyright: ignore[reportIncompatibleMethodOverride]
+    def process_update(self, dt: float) -> None:  # pyright: ignore[reportIncompatibleMethodOverride]
         """
         Update the settings screen state and render.
 

@@ -20,8 +20,6 @@ from src.ui_constants import (
 )
 
 if TYPE_CHECKING:
-    from typing import Any
-
     from pygame.event import Event
 
 
@@ -138,7 +136,7 @@ class GameOverScreen(State, state_name="game_over"):
                 self.manager.change_state("main_menu")
 
     @override
-    def process_update(self, dt: float, *args: Any) -> None:  # pyright: ignore[reportIncompatibleMethodOverride]
+    def process_update(self, dt: float) -> None:  # pyright: ignore[reportIncompatibleMethodOverride]
         """
         Update the game over screen state and render.
 

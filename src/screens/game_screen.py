@@ -12,8 +12,6 @@ from src.settings import GAME_SETTINGS
 from src.ui import ScoreDisplay, time_based_background
 
 if TYPE_CHECKING:
-    from typing import Any
-
     from src.screens.game_over_screen import GameOverScreen
 
 
@@ -37,9 +35,7 @@ class GameScreen(State, state_name="playing"):
         self.hit_sound: pygame.mixer.Sound = load_audio("hit.wav")
         self.die_sound: pygame.mixer.Sound = load_audio("die.wav")
 
-        self.game_over_screen: GameOverScreen = self.manager.state_map[
-            "game_over"
-        ]  # pyright:ignore[reportAttributeAccessIssue]
+        self.game_over_screen: GameOverScreen
 
     @override
     def on_enter(self, prevous_state: State | None = None) -> None:
@@ -61,6 +57,8 @@ class GameScreen(State, state_name="playing"):
         self.game_active: bool = True
         self.last_pipe_time: int = pygame.time.get_ticks()
         self.sound_played: bool = False
+
+        self.game_over_screen = self.manager.state_map["game_over"]  # pyright:ignore[reportAttributeAccessIssue]
 
     @override
     def process_event(self, event: pygame.event.Event) -> None:
@@ -88,7 +86,7 @@ class GameScreen(State, state_name="playing"):
                 self.bird.jump()
 
     @override
-    def process_update(self, dt: float, *args: Any) -> None:  # pyright: ignore[reportIncompatibleMethodOverride]
+    def process_update(self, dt: float) -> None:  # pyright: ignore[reportIncompatibleMethodOverride]
         """
         Update the game screen state and render.
 

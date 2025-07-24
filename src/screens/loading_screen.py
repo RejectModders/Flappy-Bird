@@ -9,8 +9,6 @@ from src.constants import SCREEN_HEIGHT, load_audio, load_image
 from src.ui import time_based_background
 
 if TYPE_CHECKING:
-    from typing import Any
-
     from pygame import Surface
     from pygame.mixer import Sound
 
@@ -71,7 +69,7 @@ class LoadingScreen(State, state_name="loading"):
             self.manager.is_running = False
 
     @override
-    def process_update(self, dt: float, *args: Any) -> None:
+    def process_update(self, dt: float) -> None:
         """
         Update the loading screen state and render.
 
