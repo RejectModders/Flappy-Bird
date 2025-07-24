@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import math
-from typing import Any, override
+from typing import TYPE_CHECKING, override
 
 import pygame
 from game_state import State
@@ -10,6 +12,9 @@ from src.screens.base_screen import BaseScreen
 from src.settings import GAME_SETTINGS
 from src.ui import Button, time_based_background
 from src.ui_constants import BUTTON_PRIMARY_COLOR, BUTTON_SECONDARY_COLOR
+
+if TYPE_CHECKING:
+    from typing import Any
 
 
 class MainMenuScreen(BaseScreen, state_name="main_menu"):

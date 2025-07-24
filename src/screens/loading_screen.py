@@ -10,6 +10,7 @@ from src.ui import time_based_background
 
 if TYPE_CHECKING:
     from typing import Any
+
     from pygame import Surface
     from pygame.mixer import Sound
 
