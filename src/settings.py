@@ -1,5 +1,8 @@
 import json
 import os
+from typing import cast
+
+import appdirs
 
 from src.constants import EASY, HARD, MEDIUM, resource_path
 
@@ -28,11 +31,16 @@ class Settings:
         """
         Initialize the Settings object, loading settings from file if available.
         """
-        # Update to store the file in the assets folder
-        self.settings_file: str = os.path.join("assets", "game_data.json")
+        app_name = "FlappyBird"
+
+        user_data_dir = cast(str, appdirs.user_data_dir(app_name))
+
+        os.makedirs(user_data_dir, exist_ok=True)
+
+        self.settings_file: str = os.path.join(user_data_dir, "game_data.json")
+
         self.difficulty: int = EASY
 
-        # Store separate high scores for each difficulty level
         self.high_scores: dict[int, int] = {EASY: 0, MEDIUM: 0, HARD: 0}
 
         self.bird_type: str = "yellow"

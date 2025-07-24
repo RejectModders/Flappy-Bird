@@ -2,7 +2,7 @@
 
 # 🐦 Flappy Bird Python
 
-A Python implementation of the classic Flappy Bird game.
+A Python implementation of the classic Flappy Bird game with enhanced features and multiple game screens.
 
 > [!CAUTION]
 > **This source requires Python version 3.12.x strictly.**
@@ -42,6 +42,55 @@ uv run main.py
 - Avoid the pipes
 - Try to get the highest score possible
 
+## 🎯 Features
+
+- **Multiple Game Screens:**
+  - Main Menu Screen
+  - Game Screen
+  - Game Over Screen
+  - Settings Screen
+  - Stats Screen
+  - Loading Screen
+
+- **Game Elements:**
+  - Different bird colors (yellow, red, blue)
+  - Day and night backgrounds
+  - Green and red pipes
+  - Sound effects
+
+- **Settings:**
+  - Customizable game settings
+  - Audio control options
+
+## 📁 Project Structure
+
+```
+├── main.py                  # Main entry point
+├── assets/                  # Game assets (sprites, audio)
+│   ├── sprites/
+│   └── audio/
+└── src/                     # Source code
+    ├── constants.py         # Game constants
+    ├── objects.py           # Game objects
+    ├── settings.py          # Game settings
+    ├── ui_constants.py      # UI constants
+    ├── ui.py                # UI components
+    └── screens/             # Different game screens
+        ├── base_screen.py
+        ├── game_screen.py
+        ├── game_over_screen.py
+        ├── loading_screen.py
+        ├── main_menu_screen.py
+        ├── settings_screen.py
+        └── stats_screen.py
+```
+
 ## 🎨 Assets
 
 Game assets are from [samuelcust/flappy-bird-assets](https://github.com/samuelcust/flappy-bird-assets).
+
+## 📈 Future Improvements
+
+- Online leaderboard
+- Additional game modes
+- Character customization options
