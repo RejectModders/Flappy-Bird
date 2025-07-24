@@ -108,6 +108,4 @@ Game assets are from [samuelcust/flappy-bird-assets](https://github.com/samuelcu
 - Additional game modes
 - Character customization options
 
-
-https://github.com/user-attachments/assets/abd8a863-9995-4f52-82f7-261a4a40a940
-
+https://github.com/user-attachments/assets/7c9d51fc-61c8-4ba0-aa08-0544a38d2b2b
