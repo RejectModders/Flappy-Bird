@@ -1,14 +1,28 @@
+Here’s an improved and finalized `README.md` with a better layout, a dedicated section for your video, clearer instructions, and some extra polish. The CAUTION blocks and all important info are preserved.
+
+```markdown
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
 
 # 🐦 Flappy Bird Python
 
 A Python implementation of the classic Flappy Bird game with enhanced features and multiple game screens.
 
+---
+
+## 🎬 Demo Video
+
+Watch the game in action:  
+https://github.com/user-attachments/assets/7c9d51fc-61c8-4ba0-aa08-0544a38d2b2b
+
+---
+
 > [!CAUTION]
 > **This source requires Python version 3.12.x strictly.**
 >
 > - Ensure you have Python 3.12.x installed before proceeding. Using any other version may result in critical errors or unexpected behavior.
 > - [Download Python 3.12.x](https://www.python.org/downloads/) if you do not already have it installed.
+
+---
 
 ### ⚠️ Windows Executable Download Instructions
 
@@ -24,11 +38,15 @@ A Python implementation of the classic Flappy Bird game with enhanced features a
 >
 > If you encounter issues running the executable, make sure your antivirus is not blocking it and that you have extracted all files before launching.
 
+---
+
 ## 📦 Requirements
 
-* Python 3.12 (strictly required)
-* [`pygame`](https://pypi.org/project/pygame/)
-* [`uv`](https://pypi.org/project/uv/) for dependency management
+- Python 3.12 (strictly required)
+- [`pygame`](https://pypi.org/project/pygame/)
+- [`uv`](https://pypi.org/project/uv/) for dependency management
+
+---
 
 ## 🚀 Getting Started
 
@@ -50,11 +68,15 @@ Then run the game:
 uv run main.py
 ```
 
+---
+
 ## 🎮 How to Play
 
-- Press SPACE to make the bird flap
+- Press `SPACE` to make the bird flap
 - Avoid the pipes
 - Try to get the highest score possible
+
+---
 
 ## 🎯 Features
 
@@ -75,6 +97,8 @@ uv run main.py
 - **Settings:**
   - Customizable game settings
   - Audio control options
+
+---
 
 ## 📁 Project Structure
 
@@ -98,9 +122,13 @@ uv run main.py
         └── stats_screen.py
 ```
 
+---
+
 ## 🎨 Assets
 
 Game assets are from [samuelcust/flappy-bird-assets](https://github.com/samuelcust/flappy-bird-assets).
+
+---
 
 ## 📈 Future Improvements
 
@@ -108,4 +136,14 @@ Game assets are from [samuelcust/flappy-bird-assets](https://github.com/samuelcu
 - Additional game modes
 - Character customization options
 
-https://github.com/user-attachments/assets/7c9d51fc-61c8-4ba0-aa08-0544a38d2b2b
+---
+
+## 🤝 Contributing
+
+Pull requests and suggestions are welcome! Please open an issue for major changes.
+
+---
+
+## 📄 License
+
+This project is for educational purposes. See the asset repository for asset licensing details.
