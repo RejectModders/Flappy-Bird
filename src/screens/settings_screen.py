@@ -1,6 +1,9 @@
-from typing import Any, Literal, override
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, override
 
 import pygame
+from game_state import State
 from pygame.locals import K_ESCAPE, KEYDOWN, QUIT
 
 from src.constants import (
@@ -17,7 +20,6 @@ from src.constants import (
     load_audio,
     load_image,
 )
-from src.screens.base_screen import BaseScreen
 from src.settings import GAME_SETTINGS
 from src.ui import Button, Slider, time_based_background
 from src.ui_constants import (
@@ -27,28 +29,25 @@ from src.ui_constants import (
     FONT_SMALL,
 )
 
+if TYPE_CHECKING:
+    from typing import Any, Literal
 
-class SettingsScreen(BaseScreen, state_name="settings"):
+    from pygame import Surface
+    from pygame.event import Event
+    from pygame.font import Font
+    from pygame.mixer import Sound
+
+
+class SettingsScreen(State, state_name="settings"):
     """
     Settings screen for adjusting game preferences.
 
     Provides UI for changing difficulty, bird and pipe types, and audio settings.
     """
 
-    @override
-    def on_setup(self) -> None:
-        """
-        Perform initial setup when the state is first loaded into the StateManager.
-
-        Initializes background, base, panel, fonts, tabs, bird and pipe sprites,
-        difficulty buttons, save/back buttons, audio settings, and volume slider.
-
-        Returns
-        -------
-        None
-        """
-        self.background: pygame.Surface = time_based_background()
-        self.base: pygame.Surface = load_image(("base.png")).convert_alpha()
+    def __init__(self) -> None:
+        self.background: Surface = time_based_background()
+        self.base: Surface = load_image(("base.png")).convert_alpha()
 
         self.base_width: int = self.base.get_width()
         self.base_height: int = self.base.get_height()
@@ -63,8 +62,8 @@ class SettingsScreen(BaseScreen, state_name="settings"):
             50,
         )
 
-        self.title_font: pygame.font.Font = FONT_LARGE
-        self.font: pygame.font.Font = FONT_SMALL
+        self.title_font: Font = FONT_LARGE
+        self.font: Font = FONT_SMALL
         self.active_tab: Literal["gameplay", "audio"] = "gameplay"
 
         self.tab_width: int = self.panel_width // 2
@@ -96,23 +95,19 @@ class SettingsScreen(BaseScreen, state_name="settings"):
         )
 
         # Bird sprites
-        self.yellow_bird: pygame.Surface = load_image(
+        self.yellow_bird: Surface = load_image(
             "yellowbird-midflap.png"
         ).convert_alpha()
-        self.blue_bird: pygame.Surface = load_image(
+        self.blue_bird: Surface = load_image(
             "bluebird-midflap.png"
         ).convert_alpha()
-        self.red_bird: pygame.Surface = load_image(
+        self.red_bird: Surface = load_image(
             "redbird-midflap.png"
         ).convert_alpha()
 
         # Pipe sprites
-        self.green_pipe: pygame.Surface = load_image(
-            "pipe-green.png"
-        ).convert_alpha()
-        self.red_pipe: pygame.Surface = load_image(
-            "pipe-red.png"
-        ).convert_alpha()
+        self.green_pipe: Surface = load_image("pipe-green.png").convert_alpha()
+        self.red_pipe: Surface = load_image("pipe-red.png").convert_alpha()
 
         self.selection_width: int = (self.panel_width - 40) // 3
         self.medium_width: int = self.selection_width
@@ -176,8 +171,8 @@ class SettingsScreen(BaseScreen, state_name="settings"):
 
         self.initial_volume: float = GAME_SETTINGS.volume
 
-        self.click_sound: pygame.mixer.Sound = load_audio("swoosh.wav")
-        self.point_sound: pygame.mixer.Sound = load_audio("point.wav")
+        self.click_sound: Sound = load_audio("swoosh.wav")
+        self.point_sound: Sound = load_audio("point.wav")
 
         self.volume_slider: Slider = Slider(
             self.panel_position[0] + 20,
@@ -193,7 +188,7 @@ class SettingsScreen(BaseScreen, state_name="settings"):
         self.has_changes: bool = False
 
     @override
-    def process_event(self, event: pygame.event.Event) -> None:
+    def process_event(self, event: Event) -> None:
         """
         Handle pygame events for the settings screen.
 
@@ -314,7 +309,7 @@ class SettingsScreen(BaseScreen, state_name="settings"):
             GAME_SETTINGS.pipe_color = "red"
 
     @override
-    def process_update(self, dt: float, args: tuple[Any, ...]) -> None:  # pyright: ignore[reportIncompatibleMethodOverride]
+    def process_update(self, dt: float, *args: Any) -> None:  # pyright: ignore[reportIncompatibleMethodOverride]
         """
         Update the settings screen state and render.
 
