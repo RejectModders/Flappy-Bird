@@ -90,7 +90,6 @@ uv run main.py
     ├── ui_constants.py      # UI constants
     ├── ui.py                # UI components
     └── screens/             # Different game screens
-        ├── base_screen.py
         ├── game_screen.py
         ├── game_over_screen.py
         ├── loading_screen.py
