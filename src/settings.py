@@ -45,7 +45,7 @@ class Settings:
 
         self.bird_type: str = "yellow"
         self.pipe_color: str = "green"
-        self.volume: float = 1.0  # Default to full volume
+        self.volume: float = 0.5
 
         # For tracking changes in the settings screen
         self.has_changes: bool = False
