@@ -1,11 +1,12 @@
-from typing import Any, override
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, override
 
 import pygame
 from game_state import State
 from pygame.locals import K_ESCAPE, K_SPACE, KEYDOWN, QUIT
 
 from src.constants import SCREEN_HEIGHT, SCREEN_WIDTH, load_audio, load_image
-from src.screens.base_screen import BaseScreen
 from src.settings import GAME_SETTINGS
 from src.ui import Button, ScoreDisplay, time_based_background
 from src.ui_constants import (
@@ -18,8 +19,13 @@ from src.ui_constants import (
     MARGIN_LARGE,
 )
 
+if TYPE_CHECKING:
+    from typing import Any
 
-class GameOverScreen(BaseScreen, state_name="game_over"):
+    from pygame.event import Event
+
+
+class GameOverScreen(State, state_name="game_over"):
     """
     Game over screen shown after the player loses.
 
@@ -27,18 +33,7 @@ class GameOverScreen(BaseScreen, state_name="game_over"):
     to retry or return to the main menu.
     """
 
-    @override
-    def on_setup(self) -> None:
-        """
-        Perform initial setup when the state is first loaded into the StateManager.
-
-        Initializes background, base, game over image, score display, buttons,
-        sound, and score attributes.
-
-        Returns
-        -------
-        None
-        """
+    def __init__(self) -> None:
         self.background: pygame.Surface = time_based_background()
         self.base: pygame.Surface = load_image(("base.png")).convert_alpha()
         self.game_over_img: pygame.Surface = load_image("gameover.png")
@@ -107,33 +102,8 @@ class GameOverScreen(BaseScreen, state_name="game_over"):
             GAME_SETTINGS.difficulty
         ]
 
-    def set_score(self, score: int) -> None:
-        """
-        Set the score from the completed game.
-
-        Parameters
-        ----------
-        score : int
-            The final score from the game.
-
-        Returns
-        -------
-        None
-        """
-        self.score = score
-
-        # Check if this is a new high score
-        if score > self.high_score:
-            self.is_new_high_score = True
-            self.high_score = score
-            # Update the high score in game settings
-            GAME_SETTINGS.high_scores[GAME_SETTINGS.difficulty] = score
-            GAME_SETTINGS.save_settings()  # Save the new high score
-        else:
-            self.is_new_high_score = False
-
     @override
-    def process_event(self, event: pygame.event.Event) -> None:
+    def process_event(self, event: Event) -> None:
         """
         Handle pygame events for the game over screen.
 
@@ -168,7 +138,7 @@ class GameOverScreen(BaseScreen, state_name="game_over"):
                 self.manager.change_state("main_menu")
 
     @override
-    def process_update(self, dt: float, args: tuple[Any, ...]) -> None:  # pyright: ignore[reportIncompatibleMethodOverride]
+    def process_update(self, dt: float, *args: Any) -> None:  # pyright: ignore[reportIncompatibleMethodOverride]
         """
         Update the game over screen state and render.
 
@@ -195,6 +165,31 @@ class GameOverScreen(BaseScreen, state_name="game_over"):
                 self.high_score_flash_timer = 0
 
         self._render()
+
+    def set_score(self, score: int) -> None:
+        """
+        Set the score from the completed game.
+
+        Parameters
+        ----------
+        score : int
+            The final score from the game.
+
+        Returns
+        -------
+        None
+        """
+        self.score = score
+
+        # Check if this is a new high score
+        if score > self.high_score:
+            self.is_new_high_score = True
+            self.high_score = score
+            # Update the high score in game settings
+            GAME_SETTINGS.high_scores[GAME_SETTINGS.difficulty] = score
+            GAME_SETTINGS.save_settings()  # Save the new high score
+        else:
+            self.is_new_high_score = False
 
     def _render(self) -> None:
         """
