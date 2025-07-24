@@ -1,4 +1,6 @@
-from typing import Any, override
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, override
 
 import pygame
 from game_state import State
@@ -6,12 +8,14 @@ from pygame.locals import K_ESCAPE, K_SPACE, KEYDOWN, MOUSEBUTTONDOWN, QUIT
 
 from src.constants import SCREEN_HEIGHT, load_audio
 from src.objects import Base, Bird, Pipe
-from src.screens.base_screen import BaseScreen
 from src.settings import GAME_SETTINGS
 from src.ui import ScoreDisplay, time_based_background
 
+if TYPE_CHECKING:
+    from src.screens.game_over_screen import GameOverScreen
 
-class GameScreen(BaseScreen, state_name="playing"):
+
+class GameScreen(State, state_name="playing"):
     """
     Game screen for Flappy Bird gameplay.
 
@@ -19,18 +23,7 @@ class GameScreen(BaseScreen, state_name="playing"):
     collision detection, and score tracking.
     """
 
-    @override
-    def on_setup(self) -> None:
-        """
-        Perform initial setup when the state is loaded into the StateManager.
-
-        Initializes background, base, bird, pipes, score, score display,
-        and loads sound effects.
-
-        Returns
-        -------
-        None
-        """
+    def __init__(self) -> None:
         self.background: pygame.Surface = time_based_background()
         self.base: Base = Base()
         self.bird: Bird = Bird(50, SCREEN_HEIGHT // 2)
@@ -41,6 +34,8 @@ class GameScreen(BaseScreen, state_name="playing"):
         self.point_sound: pygame.mixer.Sound = load_audio("point.wav")
         self.hit_sound: pygame.mixer.Sound = load_audio("hit.wav")
         self.die_sound: pygame.mixer.Sound = load_audio("die.wav")
+
+        self.game_over_screen: GameOverScreen
 
     @override
     def on_enter(self, prevous_state: State | None = None) -> None:
@@ -62,6 +57,8 @@ class GameScreen(BaseScreen, state_name="playing"):
         self.game_active: bool = True
         self.last_pipe_time: int = pygame.time.get_ticks()
         self.sound_played: bool = False
+
+        self.game_over_screen = self.manager.state_map["game_over"]  # pyright:ignore[reportAttributeAccessIssue]
 
     @override
     def process_event(self, event: pygame.event.Event) -> None:
@@ -89,7 +86,7 @@ class GameScreen(BaseScreen, state_name="playing"):
                 self.bird.jump()
 
     @override
-    def process_update(self, dt: float, args: tuple[Any, ...]) -> None:  # pyright: ignore[reportIncompatibleMethodOverride]
+    def process_update(self, dt: float) -> None:  # pyright: ignore[reportIncompatibleMethodOverride]
         """
         Update the game screen state and render.
 
@@ -147,7 +144,7 @@ class GameScreen(BaseScreen, state_name="playing"):
 
             GAME_SETTINGS.update_high_score(self.score)
 
-            self.manager._states["game_over"].set_score(self.score)
+            self.game_over_screen.set_score(self.score)
 
             pygame.time.delay(1000)
             self.manager.change_state("game_over")

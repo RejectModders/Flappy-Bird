@@ -41,11 +41,12 @@ def main() -> None:
         GameOverScreen,
         SettingsScreen,
         StatsScreen,
-        manager=state_manager,
-        window=screen,
     )
 
     state_manager.change_state("loading")
+
+    if state_manager.current_state is None:
+        raise RuntimeError("State not set.")
 
     clock = pygame.time.Clock()
 
@@ -53,11 +54,9 @@ def main() -> None:
         dt = clock.tick(FPS) / 1000.0
 
         for event in pygame.event.get():
-            if state_manager.current_state is not None:
-                state_manager.current_state.process_event(event)
+            state_manager.current_state.process_event(event)
 
-        if state_manager.current_state is not None:
-            state_manager.current_state.process_update(dt, ())
+        state_manager.current_state.process_update(dt)
 
     pygame.quit()
     sys.exit()

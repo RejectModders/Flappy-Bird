@@ -1,18 +1,25 @@
+from __future__ import annotations
+
 import math
-from typing import Any, override
+from typing import TYPE_CHECKING, override
 
 import pygame
 from game_state import State
 from pygame.locals import K_ESCAPE, KEYDOWN, QUIT
 
 from src.constants import SCREEN_HEIGHT, SCREEN_WIDTH, load_audio, load_image
-from src.screens.base_screen import BaseScreen
 from src.settings import GAME_SETTINGS
 from src.ui import Button, time_based_background
 from src.ui_constants import BUTTON_PRIMARY_COLOR, BUTTON_SECONDARY_COLOR
 
+if TYPE_CHECKING:
+    from typing import Any
 
-class MainMenuScreen(BaseScreen, state_name="main_menu"):
+    from pygame import Surface
+    from pygame.mixer import Sound
+
+
+class MainMenuScreen(State, state_name="main_menu"):
     """
     Main menu screen for the game.
 
@@ -64,23 +71,12 @@ class MainMenuScreen(BaseScreen, state_name="main_menu"):
         Sound effect for points.
     """
 
-    @override
-    def on_setup(self) -> None:
-        """
-        Perform initial setup when the state is first loaded into the StateManager.
+    def __init__(self) -> None:
+        self.background: Surface = time_based_background()
+        self.logo: Surface = load_image(("message.png")).convert_alpha()
+        self.base: Surface = load_image(("base.png")).convert_alpha()
 
-        Initializes background, logo, base, bird animation frames, animation properties,
-        base properties, button setup, and loads sounds.
-
-        Returns
-        -------
-        None
-        """
-        self.background: pygame.Surface = time_based_background()
-        self.logo: pygame.Surface = load_image(("message.png")).convert_alpha()
-        self.base: pygame.Surface = load_image(("base.png")).convert_alpha()
-
-        self.bird_frames: dict[str, list[pygame.Surface]] = {
+        self.bird_frames: dict[str, list[Surface]] = {
             "yellow": [
                 load_image((f"yellowbird-{frame}flap.png")).convert_alpha()
                 for frame in ["down", "mid", "up"]
@@ -144,8 +140,8 @@ class MainMenuScreen(BaseScreen, state_name="main_menu"):
         )
 
         # Load sounds
-        self.swoosh_sound: pygame.mixer.Sound = load_audio("swoosh.wav")
-        self.point_sound: pygame.mixer.Sound = load_audio("point.wav")
+        self.swoosh_sound: Sound = load_audio("swoosh.wav")
+        self.point_sound: Sound = load_audio("point.wav")
 
     @override
     def on_enter(self, prevous_state: State | None = None) -> None:
@@ -162,7 +158,6 @@ class MainMenuScreen(BaseScreen, state_name="main_menu"):
         None
         """
         self.animation_time = 0.0
-        self.click_occurred: bool = False
 
     @override
     def process_event(self, event: pygame.event.Event) -> None:
@@ -199,7 +194,7 @@ class MainMenuScreen(BaseScreen, state_name="main_menu"):
                 self.manager.change_state("stats")
 
     @override
-    def process_update(self, dt: float, args: tuple[Any, ...]) -> None:  # pyright: ignore[reportIncompatibleMethodOverride]
+    def process_update(self, dt: float) -> None:  # pyright: ignore[reportIncompatibleMethodOverride]
         """
         Update the main menu state and render.
 
