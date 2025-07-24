@@ -4,35 +4,19 @@ import pygame
 
 from src.constants import (
     BIRD_JUMP,
-    EASY,
-    GAME_SETTINGS,
-    HARD,
+    PIPE_GAP,
     PIPE_VELOCITY,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
     load_audio,
     load_image,
 )
+from src.settings import GAME_SETTINGS
 
 
 class Bird:
     """
     Represents the player-controlled bird in the game.
-
-    Methods
-    -------
-    __init__(x, y)
-        Initializes the Bird object at the given coordinates.
-    update_bird_type()
-        Updates the bird's animation frames based on the current bird type in settings.
-    update()
-        Updates the bird's position, velocity, and animation state.
-    draw(surface)
-        Draws the bird on the given surface with rotation based on velocity.
-    jump()
-        Makes the bird jump by setting its velocity and playing the flap sound.
-    reset(x, y)
-        Resets the bird's position, velocity, and animation state.
     """
 
     def __init__(self, x: float, y: float) -> None:
@@ -52,7 +36,6 @@ class Bird:
         self.animation_index: int = 0
         self.frame_count: int = 0
 
-        # Load frames based on bird type from settings
         self.update_bird_type()
 
         self.rect: pygame.Rect = pygame.Rect(
@@ -63,9 +46,20 @@ class Bird:
         )
         self.flap_sound: pygame.mixer.Sound = load_audio("wing.wav")
 
+        self.mask: pygame.mask.Mask | None = None
+        self.current_rotation: float = 0
+        self.hitbox_reduction: int = 4
+
+        self.rotated_image: pygame.Surface = self.frames[0]
+        self.update_rotated_image()
+
     def update_bird_type(self) -> None:
         """
         Update the bird's animation frames based on the current bird type in settings.
+
+        Returns
+        -------
+        None
         """
         bird_type = GAME_SETTINGS.bird_type
         self.frames: list[pygame.Surface] = [
@@ -77,20 +71,53 @@ class Bird:
     def update(self) -> None:
         """
         Update the bird's position, velocity, and animation state.
+
+        Returns
+        -------
+        None
         """
-        # Apply gravity based on difficulty
         self.velocity += GAME_SETTINGS.get_gravity()
         self.y += self.velocity
 
-        # Update rectangle position for collision detection
         self.rect.y = int(self.y)
         self.rect.x = int(self.x)
 
-        # Animation
         self.frame_count += 1
-        if self.frame_count > 5:  # Change animation every 5 frames
+        if self.frame_count > 5:
             self.frame_count = 0
             self.animation_index = (self.animation_index + 1) % 3
+
+        self.update_rotated_image()
+
+    def update_rotated_image(self) -> None:
+        """
+        Update the rotated image based on current velocity and animation frame.
+
+        Ensures the rotated image is always available for collision detection.
+
+        Returns
+        -------
+        None
+        """
+        max_rotation = 25
+        min_rotation = -90
+        self.current_rotation = min(
+            max(self.velocity * -2, min_rotation), max_rotation
+        )
+
+        image = self.frames[self.animation_index]
+        self.rotated_image = pygame.transform.rotate(
+            image, self.current_rotation
+        )
+
+        self.mask = pygame.mask.from_surface(self.rotated_image)
+
+        rotated_rect = self.rotated_image.get_rect(
+            center=(int(self.x), int(self.y))
+        )
+        self.rect = rotated_rect.inflate(
+            -self.hitbox_reduction, -self.hitbox_reduction
+        )
 
     def draw(self, surface: pygame.Surface) -> None:
         """
@@ -100,16 +127,36 @@ class Bird:
         ----------
         surface : pygame.Surface
             The surface to draw the bird on.
+
+        Returns
+        -------
+        None
         """
-        # Rotate bird based on velocity (diving angle)
-        rotated_bird = pygame.transform.rotate(
-            self.frames[self.animation_index], -self.velocity * 3
+        rotated_rect = self.rotated_image.get_rect(
+            center=(int(self.x), int(self.y))
         )
-        surface.blit(rotated_bird, (self.x, self.y))
+        surface.blit(self.rotated_image, rotated_rect)
+
+    def get_mask(self) -> pygame.mask.Mask | None:
+        """
+        Get the current mask for pixel-perfect collision detection.
+
+        Returns
+        -------
+        pygame.mask.Mask or None
+            The mask representing the bird's current visual state, or None if not available.
+        """
+        if self.mask is None:
+            self.mask = pygame.mask.from_surface(self.rotated_image)
+        return self.mask
 
     def jump(self) -> None:
         """
         Make the bird jump by setting its velocity and playing the flap sound.
+
+        Returns
+        -------
+        None
         """
         self.velocity = BIRD_JUMP
         self.flap_sound.play()
@@ -121,182 +168,244 @@ class Bird:
         Parameters
         ----------
         x : float
-            The new x-coordinate for the bird.
+            The x-coordinate to reset the bird to.
         y : float
-            The new y-coordinate for the bird.
+            The y-coordinate to reset the bird to.
+
+        Returns
+        -------
+        None
         """
         self.x = x
         self.y = y
         self.velocity = 0
         self.animation_index = 0
         self.frame_count = 0
+
+        self.update_bird_type()
+
         self.rect.x = int(x)
         self.rect.y = int(y)
-        # Update bird type in case settings changed
-        self.update_bird_type()
 
 
 class Pipe:
     """
     Represents a pair of pipes (top and bottom) in the game.
-
-    Methods
-    -------
-    __init__(x)
-        Initializes the Pipe object at the given x-coordinate.
-    update()
-        Updates the pipe's position based on the current difficulty.
-    draw(surface)
-        Draws the top and bottom pipes on the given surface.
     """
 
-    def __init__(self, x: float) -> None:
+    def __init__(self) -> None:
         """
-        Initialize the Pipe object at the specified x-coordinate.
+        Initialize a pair of pipes with random heights.
 
-        Parameters
-        ----------
-        x : float
-            The initial x-coordinate of the pipe.
+        Returns
+        -------
+        None
         """
-        self.x: float = x
         self.pipe_color: str = GAME_SETTINGS.pipe_color
         self.pipe_img: pygame.Surface = load_image(
             f"pipe-{self.pipe_color}.png"
         )
-        self.top_pipe: pygame.Surface = pygame.transform.flip(
+        self.pipe_top: pygame.Surface = pygame.transform.flip(
             self.pipe_img, False, True
         )
-        self.bottom_pipe: pygame.Surface = self.pipe_img
+        self.pipe_bottom: pygame.Surface = self.pipe_img
+
+        self.gap: int = PIPE_GAP
+        self.x: int = SCREEN_WIDTH
+
+        self.height: int = random.randint(80, 280)
+
+        self.top_rect: pygame.Rect = self.pipe_top.get_rect(
+            topleft=(self.x, self.height - self.pipe_top.get_height())
+        )
+        self.bottom_rect: pygame.Rect = self.pipe_bottom.get_rect(
+            topleft=(self.x, self.height + self.gap)
+        )
+
+        self.top_mask: pygame.mask.Mask = pygame.mask.from_surface(
+            self.pipe_top
+        )
+        self.bottom_mask: pygame.mask.Mask = pygame.mask.from_surface(
+            self.pipe_bottom
+        )
+
         self.passed: bool = False
+        self.center_passed: bool = False
 
-        # Get appropriate pipe gap based on difficulty
-        self.pipe_gap: int = GAME_SETTINGS.get_pipe_gap()
-
-        # Calculate the base height to account for ground height
-        ground_y = SCREEN_HEIGHT - load_image("base.png").get_height()
-
-        # Improved height range to prevent pipes from appearing too close to ground or ceiling
-        # Min height ensures top pipe isn't too short
-        # Max height ensures bottom pipe doesn't clip into ground
-        min_height = 80  # Minimum height for top pipe
-        max_height = (
-            ground_y - self.pipe_gap - 80
-        )  # Maximum height ensuring bottom pipe has space
-
-        # Make height range more challenging based on difficulty
-        if GAME_SETTINGS.difficulty == HARD:
-            # For hard difficulty, allow more extreme pipe placements
-            min_height = 60
-            max_height = ground_y - self.pipe_gap - 60
-
-        self.height: int = random.randint(min_height, max_height)
-
-        # Create rects for collision detection
-        self.top_rect: pygame.Rect = pygame.Rect(
-            int(x),
-            self.height - self.top_pipe.get_height(),
-            self.top_pipe.get_width(),
-            self.top_pipe.get_height(),
-        )
-        self.bottom_rect: pygame.Rect = pygame.Rect(
-            int(x),
-            self.height + self.pipe_gap,
-            self.bottom_pipe.get_width(),
-            self.bottom_pipe.get_height(),
-        )
-
-    def update(self) -> None:
+    def update(self) -> bool:
         """
-        Update the pipe's position based on the current difficulty.
-        """
-        # Make pipe speed dependent on difficulty
-        velocity = PIPE_VELOCITY
-        if GAME_SETTINGS.difficulty == HARD:
-            velocity -= 1  # Faster for hard mode
-        elif GAME_SETTINGS.difficulty == EASY:
-            velocity += 1  # Slower for easy mode
+        Update pipe position and check if it's off-screen.
 
-        self.x += velocity
-        self.top_rect.x = int(self.x)
-        self.bottom_rect.x = int(self.x)
+        Returns
+        -------
+        bool
+            True if the pipe is still on screen, False otherwise.
+        """
+        self.x += PIPE_VELOCITY
+        self.top_rect.x = self.x
+        self.bottom_rect.x = self.x
+
+        return self.x > -self.pipe_top.get_width()
 
     def draw(self, surface: pygame.Surface) -> None:
         """
-        Draw the top and bottom pipes on the given surface.
+        Draw both top and bottom pipes on the given surface.
 
         Parameters
         ----------
         surface : pygame.Surface
             The surface to draw the pipes on.
+
+        Returns
+        -------
+        None
         """
-        # Draw top pipe
-        surface.blit(
-            self.top_pipe, (self.x, self.height - self.top_pipe.get_height())
+        surface.blit(self.pipe_top, self.top_rect)
+        surface.blit(self.pipe_bottom, self.bottom_rect)
+
+    def check_collision(self, bird: Bird) -> bool:
+        """
+        Check if the bird collides with either the top or bottom pipe using mask-based collision.
+
+        Parameters
+        ----------
+        bird : Bird
+            The bird object to check collision with.
+
+        Returns
+        -------
+        bool
+            True if collision detected, False otherwise.
+        """
+        bird_mask = bird.get_mask()
+        if bird_mask is None:
+            return False
+
+        bird_visual_rect = bird.rotated_image.get_rect(
+            center=(int(bird.x), int(bird.y))
         )
-        # Draw bottom pipe
-        surface.blit(self.bottom_pipe, (self.x, self.height + self.pipe_gap))
+
+        top_offset = (
+            int(self.top_rect.x - bird_visual_rect.x),
+            int(self.top_rect.y - bird_visual_rect.y),
+        )
+        bottom_offset = (
+            int(self.bottom_rect.x - bird_visual_rect.x),
+            int(self.bottom_rect.y - bird_visual_rect.y),
+        )
+
+        top_point = bird_mask.overlap(self.top_mask, top_offset)
+        bottom_point = bird_mask.overlap(self.bottom_mask, bottom_offset)
+
+        return top_point is not None or bottom_point is not None
 
 
 class Base:
     """
-    Represents the scrolling ground base in the game.
-
-    Methods
-    -------
-    __init__()
-        Initializes the Base object.
-    update()
-        Updates the base's position to create a scrolling effect.
-    draw(surface)
-        Draws the base on the given surface, creating a seamless loop.
+    Represents the moving ground in the game.
     """
 
     def __init__(self) -> None:
         """
-        Initialize the Base object.
+        Initialize the base object with animation properties.
+
+        Returns
+        -------
+        None
         """
         self.image: pygame.Surface = load_image("base.png")
         self.width: int = self.image.get_width()
-        self.x: float = 0
-        self.y: int = SCREEN_HEIGHT - self.image.get_height()
-        self.rect: pygame.Rect = pygame.Rect(
-            int(self.x), self.y, self.width, self.image.get_height()
+        self.height: int = self.image.get_height()
+        self.y: int = SCREEN_HEIGHT - self.height
+        self.x1: float = 0
+        self.x2: float = self.width
+        self.velocity: int = PIPE_VELOCITY
+
+        self.mask: pygame.mask.Mask = pygame.mask.from_surface(self.image)
+
+        self.rect1: pygame.Rect = self.image.get_rect(
+            topleft=(self.x1, self.y)
         )
-        self.scroll_speed: float = 2  # Base scroll speed
+        self.rect2: pygame.Rect = self.image.get_rect(
+            topleft=(self.x2, self.y)
+        )
 
     def update(self) -> None:
         """
-        Update the base's position to create a scrolling effect.
+        Update the base position for scrolling animation.
+
+        Returns
+        -------
+        None
         """
-        # Adjust speed based on difficulty
-        speed_modifier = 1.0
-        if GAME_SETTINGS.difficulty == HARD:
-            speed_modifier = 1.5
-        elif GAME_SETTINGS.difficulty == EASY:
-            speed_modifier = 0.8
+        self.x1 += self.velocity
+        self.x2 += self.velocity
 
-        # Move base to the left
-        self.x -= self.scroll_speed * speed_modifier
+        self.rect1.x = int(self.x1)
+        self.rect2.x = int(self.x2)
 
-        # Reset position when enough of the image has scrolled to create a seamless loop
-        if self.x <= -self.width + SCREEN_WIDTH:
-            self.x = 0
+        if self.x1 + self.width < 0:
+            self.x1 = self.x2 + self.width
+            self.rect1.x = int(self.x1)
 
-        # Update collision rectangle
-        self.rect.x = int(self.x)
+        if self.x2 + self.width < 0:
+            self.x2 = self.x1 + self.width
+            self.rect2.x = int(self.x2)
 
     def draw(self, surface: pygame.Surface) -> None:
         """
-        Draw the base on the given surface, creating a seamless loop.
+        Draw the base on the given surface.
 
         Parameters
         ----------
         surface : pygame.Surface
             The surface to draw the base on.
-        """
-        # Draw first copy of the base
-        surface.blit(self.image, (self.x, self.y))
 
-        # Draw second copy to create seamless scrolling
-        surface.blit(self.image, (self.x + self.width, self.y))
+        Returns
+        -------
+        None
+        """
+        surface.blit(self.image, (self.x1, self.y))
+        surface.blit(self.image, (self.x2, self.y))
+
+    def check_collision(self, bird: Bird) -> bool:
+        """
+        Check if the bird collides with the ground or ceiling.
+
+        Parameters
+        ----------
+        bird : Bird
+            The bird object to check collision with.
+
+        Returns
+        -------
+        bool
+            True if collision detected, False otherwise.
+        """
+        bird_visual_rect = bird.rotated_image.get_rect(
+            center=(int(bird.x), int(bird.y))
+        )
+        if bird_visual_rect.top < 0:
+            return True
+
+        bird_mask = bird.get_mask()
+        if bird_mask is None:
+            return False
+
+        if bird_visual_rect.colliderect(self.rect1):
+            base_offset = (
+                int(self.rect1.x - bird_visual_rect.x),
+                int(self.rect1.y - bird_visual_rect.y),
+            )
+            if bird_mask.overlap(self.mask, base_offset):
+                return True
+
+        if bird_visual_rect.colliderect(self.rect2):
+            base_offset = (
+                int(self.rect2.x - bird_visual_rect.x),
+                int(self.rect2.y - bird_visual_rect.y),
+            )
+            if bird_mask.overlap(self.mask, base_offset):
+                return True
+
+        return False

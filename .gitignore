@@ -175,6 +175,3 @@ cython_debug/
 
 # Bot Logs
 /logs
-
-# Game Data
-game_data.json
