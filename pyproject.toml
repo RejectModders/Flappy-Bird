@@ -14,8 +14,8 @@ dependencies = [
 dev = [
     "basedpyright>=1.31.3",
     "isort>=6.0.1",
-    "nuitka>=2.7.12",
-    "ruff>=0.12.10",
+    "nuitka>=2.7.13",
+    "ruff>=0.12.11",
 ]
 
 [tool.isort]
