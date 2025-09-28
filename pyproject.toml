@@ -6,16 +6,16 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "appdirs>=1.4.4",
-    "game-state>=2.0.1",
+    "game-state>=2.0.2",
     "pygame>=2.6.1",
 ]
 
 [dependency-groups]
 dev = [
-    "basedpyright>=1.31.4",
+    "basedpyright>=1.31.5",
     "isort>=6.0.1",
     "nuitka>=2.7.16",
-    "ruff>=0.13.1",
+    "ruff>=0.13.2",
 ]
 
 [tool.isort]
