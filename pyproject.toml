@@ -12,10 +12,10 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "basedpyright>=1.38.4",
+    "basedpyright>=1.39.0",
     "isort>=6.1.0",
     "nuitka>=4.0.7",
-    "ruff>=0.15.8",
+    "ruff>=0.15.9",
 ]
 
 [tool.isort]
