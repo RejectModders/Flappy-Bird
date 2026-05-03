@@ -44,7 +44,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "appdirs", specifier = ">=1.4.4" },
-    { name = "game-state", specifier = ">=2.4.0" },
+    { name = "game-state", specifier = ">=2.4.1" },
     { name = "pygame", specifier = ">=2.6.1" },
 ]
 
@@ -58,11 +58,11 @@ dev = [
 
 [[package]]
 name = "game-state"
-version = "2.4.0"
+version = "2.4.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/35/10/f0e9ef74abbbe9c13d96f117abf63dbeed4720c25be01a98e55508069467/game_state-2.4.0.tar.gz", hash = "sha256:c1a7fb87e3aca05cb2156f17b66d12b667760d23f145ed8237b85d3bba153a73", size = 20712, upload-time = "2026-01-02T07:57:33.439Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/df/fc/b446ca4f29bca20deed86a60181d6b9674c1905e58d14ef4b0195519df2b/game_state-2.4.1.tar.gz", hash = "sha256:2caae9c9a3a06d40e2a3c14016f261e2eb7af9f0ef6e707e1ee04e6ec8128748", size = 20921, upload-time = "2026-04-29T15:05:52.542Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9d/c4/e5dd0b7a5ab4b34ddf776d0dfaa30b24f772395c735046b342f1e59eb595/game_state-2.4.0-py3-none-any.whl", hash = "sha256:8710c08aa88fcde464cf422e69fd803ccf8249ed783c6f9d57393b189a84b925", size = 21891, upload-time = "2026-01-02T07:57:32.283Z" },
+    { url = "https://files.pythonhosted.org/packages/8b/0c/6de7f2fa37216fbfa8e6c9b2a09203e0fe7be4fafa0ff70e055ef9c4d69b/game_state-2.4.1-py3-none-any.whl", hash = "sha256:6b23e4339fca2cff6bb195dfabe069e28060cdf01844fe13ee9740440be5d803", size = 22025, upload-time = "2026-04-29T15:05:51.201Z" },
 ]
 
 [[package]]
