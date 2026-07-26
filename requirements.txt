@@ -4,9 +4,9 @@ appdirs==1.4.4 \
     --hash=sha256:7d5d0167b2b1ba821647616af46a749d1c653740dd0d2415100fe26e27afdf41 \
     --hash=sha256:a841dacd6b99318a741b166adb07e19ee71a274450e68237b4650ca1055ab128
     # via flappy-bird
-game-state==2.4.1 \
-    --hash=sha256:2caae9c9a3a06d40e2a3c14016f261e2eb7af9f0ef6e707e1ee04e6ec8128748 \
-    --hash=sha256:6b23e4339fca2cff6bb195dfabe069e28060cdf01844fe13ee9740440be5d803
+game-state==2.5.0 \
+    --hash=sha256:6c284a5029ea4cf70b9739d1cecec643dd9ab926bff2751da5409840e6ab087a \
+    --hash=sha256:e850f869fe959a585741f2924c7a0ac4a47522579380df2e19df1af19a947339
     # via flappy-bird
 pygame==2.6.1 \
     --hash=sha256:1206125f14cae22c44565c9d333607f1d9f59487b1f1432945dfc809aeaa3e88 \
