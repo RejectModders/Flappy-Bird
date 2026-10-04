@@ -15,7 +15,7 @@ dev = [
     "basedpyright>=1.40.1",
     "isort>=6.1.0",
     "nuitka>=4.2.2",
-    "ruff>=0.16.9",
+    "ruff>=0.16.10",
 ]
 
 [tool.isort]
